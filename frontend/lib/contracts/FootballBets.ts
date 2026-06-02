@@ -1,13 +1,20 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 import type { Bet, LeaderboardEntry, TransactionReceipt } from "./types";
+import {
+  estimateWriteFeePreset,
+  feePresetToTransactionFees,
+  type FeePresetEstimate,
+  type FeePresetLevel,
+} from "../genlayer/fees";
 
 /**
  * FootballBets contract class for interacting with the GenLayer Football Betting contract
  */
 class FootballBets {
   private contractAddress: `0x${string}`;
-  private client: ReturnType<typeof createClient>;
+  private client: any;
+  private studioUrl?: string;
 
   constructor(
     contractAddress: string,
@@ -15,6 +22,7 @@ class FootballBets {
     studioUrl?: string
   ) {
     this.contractAddress = contractAddress as `0x${string}`;
+    this.studioUrl = studioUrl;
 
     const config: any = {
       chain: studionet,
@@ -40,7 +48,44 @@ class FootballBets {
       account: address as `0x${string}`,
     };
 
+    if (this.studioUrl) {
+      config.endpoint = this.studioUrl;
+    }
+
     this.client = createClient(config);
+  }
+
+  async estimateCreateBetFees(
+    gameDate: string,
+    team1: string,
+    team2: string,
+    predictedWinner: string,
+    level: FeePresetLevel = "standard"
+  ): Promise<FeePresetEstimate | undefined> {
+    return estimateWriteFeePreset(
+      this.client,
+      {
+        address: this.contractAddress,
+        functionName: "create_bet",
+        args: [gameDate, team1, team2, predictedWinner],
+      },
+      level,
+    );
+  }
+
+  async estimateResolveBetFees(
+    betId: string,
+    level: FeePresetLevel = "standard"
+  ): Promise<FeePresetEstimate | undefined> {
+    return estimateWriteFeePreset(
+      this.client,
+      {
+        address: this.contractAddress,
+        functionName: "resolve_bet",
+        args: [betId],
+      },
+      level,
+    );
   }
 
   /**
@@ -149,14 +194,17 @@ class FootballBets {
     gameDate: string,
     team1: string,
     team2: string,
-    predictedWinner: string
+    predictedWinner: string,
+    feePreset?: FeePresetEstimate
   ): Promise<TransactionReceipt> {
     try {
+      const fees = feePresetToTransactionFees(feePreset);
       const txHash = await this.client.writeContract({
         address: this.contractAddress,
         functionName: "create_bet",
         args: [gameDate, team1, team2, predictedWinner],
         value: BigInt(0),
+        ...(fees ? { fees } : {}),
       });
 
       const receipt = await this.client.waitForTransactionReceipt({
@@ -180,11 +228,14 @@ class FootballBets {
    */
   async resolveBet(betId: string): Promise<TransactionReceipt> {
     try {
+      const feePreset = await this.estimateResolveBetFees(betId);
+      const fees = feePresetToTransactionFees(feePreset);
       const txHash = await this.client.writeContract({
         address: this.contractAddress,
         functionName: "resolve_bet",
         args: [betId],
         value: BigInt(0),
+        ...(fees ? { fees } : {}),
       });
 
       const receipt = await this.client.waitForTransactionReceipt({

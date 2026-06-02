@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import FootballBets from "../contracts/FootballBets";
 import { getContractAddress, getStudioUrl } from "../genlayer/client";
+import type { FeePresetLevel } from "../genlayer/fees";
 import { useWallet } from "../genlayer/wallet";
 import { success, error, configError } from "../utils/toast";
 import type { Bet, LeaderboardEntry } from "../contracts/types";
@@ -126,11 +127,13 @@ export function useCreateBet() {
       team1,
       team2,
       predictedWinner,
+      feePresetLevel,
     }: {
       gameDate: string;
       team1: string;
       team2: string;
       predictedWinner: string;
+      feePresetLevel?: FeePresetLevel;
     }) => {
       if (!contract) {
         throw new Error("Contract not configured. Please set NEXT_PUBLIC_CONTRACT_ADDRESS in your .env file.");
@@ -139,7 +142,14 @@ export function useCreateBet() {
         throw new Error("Wallet not connected. Please connect your wallet to create a bet.");
       }
       setIsCreating(true);
-      return contract.createBet(gameDate, team1, team2, predictedWinner);
+      const feePreset = await contract.estimateCreateBetFees(
+        gameDate,
+        team1,
+        team2,
+        predictedWinner,
+        feePresetLevel ?? "standard"
+      );
+      return contract.createBet(gameDate, team1, team2, predictedWinner, feePreset);
     },
     onSuccess: () => {
       // Invalidate and refetch bets and points after successful creation

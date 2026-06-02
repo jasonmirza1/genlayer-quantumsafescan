@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { Plus, Loader2, Calendar, Users } from "lucide-react";
 import { useCreateBet } from "@/lib/hooks/useFootballBets";
+import type { FeePresetLevel } from "@/lib/genlayer/fees";
 import { useWallet } from "@/lib/genlayer/wallet";
-import { success, error } from "@/lib/utils/toast";
+import { error } from "@/lib/utils/toast";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Input } from "./ui/input";
@@ -19,6 +20,7 @@ export function CreateBetModal() {
   const [team1, setTeam1] = useState("");
   const [team2, setTeam2] = useState("");
   const [predictedWinner, setPredictedWinner] = useState<"1" | "2" | "0" | "">("");
+  const [feePresetLevel, setFeePresetLevel] = useState<FeePresetLevel>("standard");
 
   const [errors, setErrors] = useState({
     gameDate: "",
@@ -80,6 +82,7 @@ export function CreateBetModal() {
       team1,
       team2,
       predictedWinner: predictedWinner, // Send "1", "2", or "0" directly
+      feePresetLevel,
     });
   };
 
@@ -242,6 +245,31 @@ export function CreateBetModal() {
             {errors.predictedWinner && (
               <p className="text-xs text-destructive">{errors.predictedWinner}</p>
             )}
+          </div>
+
+          <div className="space-y-3">
+            <Label>Fee Preset</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: "low", label: "Low", detail: "No appeals" },
+                { value: "standard", label: "Standard", detail: "1 appeal" },
+                { value: "high", label: "High", detail: "2 appeals" },
+              ] as const).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setFeePresetLevel(option.value)}
+                  className={`rounded-md border px-3 py-2 text-left transition-all ${
+                    feePresetLevel === option.value
+                      ? "border-accent bg-accent/20 text-accent"
+                      : "border-white/10 hover:border-white/20"
+                  }`}
+                >
+                  <div className="text-sm font-semibold">{option.label}</div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">{option.detail}</div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Submit Button */}

@@ -1,4 +1,4 @@
-# { "Depends": "py-genlayer:test" }
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 """
 PatternTest.py — Minimal contract to test GenLayer patterns.
 Covers: gl.vm.Return, partial field matching, u256 arithmetic,

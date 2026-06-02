@@ -41,7 +41,7 @@ VALID_PNG = base64.b64decode(_VALID_PNG_B64)
 # Uses run_nondet_unsafe directly so validator does NOT call spawn_sandbox.
 # This is necessary because wasi_mock doesn't implement the Sandbox gl_call.
 _NONDET_CONTRACT = '''\
-# { "Depends": "py-genlayer:test" }
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
 import genlayer.gl.vm as glvm
 
@@ -74,7 +74,7 @@ class NondetContract(gl.Contract):
 '''
 
 _VISUAL_CONTRACT = '''\
-# { "Depends": "py-genlayer:test" }
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
 
 
