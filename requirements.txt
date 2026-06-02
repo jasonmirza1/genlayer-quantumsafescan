@@ -1,5 +1,5 @@
-genlayer-test>=0.25.0
-genvm-linter>=0.7.0
+genlayer-test>=0.29.2
+genvm-linter>=0.10.0
 requests>=2.31.0
 python-dotenv>=1.0.1
 eth-account>=0.13.3
