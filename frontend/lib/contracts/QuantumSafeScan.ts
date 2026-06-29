@@ -59,6 +59,59 @@ function normalizeScan(raw: any): ScanResult | null {
   };
 }
 
+function assertSuccessfulTransaction(receipt: any): void {
+  const statusName = receipt?.statusName ?? receipt?.status_name;
+  if (statusName && statusName !== "ACCEPTED" && statusName !== "FINALIZED") {
+    throw new Error(`Scan transaction ended with status ${statusName}.`);
+  }
+
+  const resultName = receipt?.resultName ?? receipt?.result_name;
+  if (
+    resultName &&
+    resultName !== "AGREE" &&
+    resultName !== "MAJORITY_AGREE"
+  ) {
+    throw new Error(`Validators did not accept the scan (${resultName}).`);
+  }
+
+  const consensus = receipt?.consensus_data ?? receipt?.consensusData;
+  const leaderReceipts = consensus?.leader_receipt ?? consensus?.leaderReceipt ?? [];
+  const validators = consensus?.validators ?? [];
+  const topLevelResults = [
+    receipt?.txExecutionResultName,
+    receipt?.executionResultName,
+    receipt?.execution_result,
+  ].filter((value): value is string => typeof value === "string");
+  const leaderResults = [
+    ...(Array.isArray(leaderReceipts) ? leaderReceipts : [leaderReceipts]).map(
+      (entry: any) =>
+        entry?.txExecutionResultName ??
+        entry?.executionResultName ??
+        entry?.execution_result,
+    ),
+  ].filter((value): value is string => typeof value === "string");
+  const fallbackValidatorResults = [
+    ...(Array.isArray(validators) ? validators : []).map(
+      (entry: any) =>
+        entry?.txExecutionResultName ??
+        entry?.executionResultName ??
+        entry?.execution_result,
+    ),
+  ].filter((value): value is string => typeof value === "string");
+  const executionResults =
+    topLevelResults.length > 0 || leaderResults.length > 0
+      ? [...topLevelResults, ...leaderResults]
+      : fallbackValidatorResults;
+
+  if (
+    executionResults.some(
+      (value) => value === "ERROR" || value === "FINISHED_WITH_ERROR",
+    )
+  ) {
+    throw new Error("The scan transaction was accepted but contract execution failed.");
+  }
+}
+
 class QuantumSafeScan {
   private contractAddress: `0x${string}`;
   private client: any;
@@ -131,10 +184,11 @@ class QuantumSafeScan {
     const receipt = await this.client.waitForTransactionReceipt({
       hash: txHash,
       status: "ACCEPTED" as any,
-      retries: 30,
+      retries: 120,
       interval: 5000,
     });
 
+    assertSuccessfulTransaction(receipt);
     return receipt as TransactionReceipt;
   }
 

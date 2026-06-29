@@ -9,7 +9,7 @@ QuantumSafeScan Lite is a GenLayer Builder project that scans public GitHub repo
 1. A user connects a wallet in the frontend.
 2. The user enters a public GitHub repository URL.
 3. The frontend submits the URL to the `QuantumSafeScan` Intelligent Contract.
-4. The contract renders public GitHub evidence, asks an LLM to normalize security signals, and requires validator agreement through `gl.eq_principle.strict_eq`.
+4. The contract renders public GitHub evidence, asks an LLM to normalize security signals, and requires semantic validator agreement through `gl.eq_principle.prompt_comparative`.
 5. The contract stores the latest scan for the caller with:
    - `target_url`
    - `score` from 0 to 100
@@ -31,7 +31,7 @@ The MVP uses GenLayer for:
 - Persistent `TreeMap` storage
 - Public web rendering via `gl.nondet.web.render`
 - LLM extraction via `gl.nondet.exec_prompt`
-- Validator equivalence with `gl.eq_principle.strict_eq`
+- Validator equivalence with `gl.eq_principle.prompt_comparative`
 
 ## Contract
 
@@ -133,8 +133,10 @@ Latest deployment:
 - Network: Genlayer Studio Network (`studionet`)
 - Chain ID: `61999`
 - RPC: `https://studio.genlayer.com/api`
-- Contract address: `0x125A819C23c8f293Af98CcF320FeCFfE29B1820B`
-- Deployment transaction hash: `0xc85d1d8db351e24f574e105523dd5b70c99358d16f9639436ce703c0d77c590a`
+- Contract address: `0x3D94a8437F37f6cd49086CA1c44c4202Ff979436`
+- Deployment transaction hash: `0x18597d54c6fe2952054e40ade9248f14d7ad8cb505477271531a41fe7f479545`
+- Verified scan transaction hash: `0xba2f0c71321a6e1a4cfc45a2f10b318ac3b23131eff64ad73a172ae411d52804`
+- Verification: deployment execution `SUCCESS`; scan consensus `MAJORITY_AGREE`; on-chain scan count `1`
 - Explorer link: TODO - the configured explorer endpoint returned `DEPLOYMENT_PAUSED` during verification
 
 1. Select the target network:
@@ -158,7 +160,7 @@ frontend/.env
 using:
 
 ```text
-NEXT_PUBLIC_CONTRACT_ADDRESS=0x125A819C23c8f293Af98CcF320FeCFfE29B1820B
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x3D94a8437F37f6cd49086CA1c44c4202Ff979436
 ```
 
 4. Restart the frontend.

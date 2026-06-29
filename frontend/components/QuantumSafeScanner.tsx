@@ -22,7 +22,8 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
-const DEFAULT_REPO_URL = "https://github.com/genlayerlabs/genlayer-project-boilerplate";
+const DEFAULT_REPO_URL =
+  "https://github.com/jasonmirza1/genlayer-quantumsafescan";
 
 function riskStyles(risk?: ScanResult["risk_level"]) {
   if (risk === "LOW") {
@@ -35,7 +36,7 @@ function riskStyles(risk?: ScanResult["risk_level"]) {
 }
 
 export function QuantumSafeScanner() {
-  const { address, isConnected } = useWallet();
+  const { address, isConnected, isOnCorrectNetwork } = useWallet();
   const [repoUrl, setRepoUrl] = useState(DEFAULT_REPO_URL);
   const latestScan = useLatestScan(address);
   const scanCount = useScanCount();
@@ -75,6 +76,9 @@ export function QuantumSafeScanner() {
           <p className="text-muted-foreground">
             AI Security & Quantum Readiness Scanner on GenLayer
           </p>
+          <p className="text-sm text-muted-foreground">
+            Reviews public repository overview and security-policy evidence.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,12 +105,27 @@ export function QuantumSafeScanner() {
             </Alert>
           ) : null}
 
+          {isConnected && !isOnCorrectNetwork ? (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Switch to GenLayer Studio</AlertTitle>
+              <AlertDescription>
+                Change the connected wallet network before running a scan.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
           <Button
             type="submit"
             variant="gradient"
             size="lg"
             className="w-full md:w-auto"
-            disabled={!isConnected || !isValidGithubUrl || submitScan.isSubmitting}
+            disabled={
+              !isConnected ||
+              !isOnCorrectNetwork ||
+              !isValidGithubUrl ||
+              submitScan.isSubmitting
+            }
           >
             {submitScan.isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -120,7 +139,9 @@ export function QuantumSafeScanner() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="rounded-md border border-white/10 p-4">
             <p className="text-xs text-muted-foreground">Total scans</p>
-            <p className="text-2xl font-bold">{scanCount.data ?? 0}</p>
+            <p className="text-2xl font-bold">
+              {scanCount.isError ? "Unavailable" : scanCount.data ?? 0}
+            </p>
           </div>
           <div className="rounded-md border border-white/10 p-4">
             <p className="text-xs text-muted-foreground">Contract</p>
@@ -148,7 +169,15 @@ export function QuantumSafeScanner() {
           <FileSearch className="h-6 w-6 text-accent" />
         </div>
 
-        {latestScan.isLoading ? (
+        {latestScan.isError ? (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Contract unavailable</AlertTitle>
+            <AlertDescription>
+              The configured contract could not be read on GenLayer Studio.
+            </AlertDescription>
+          </Alert>
+        ) : latestScan.isLoading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading result...

@@ -34,13 +34,62 @@ class _Public:
         return fn
 
 
+class _Return:
+    def __init__(self, calldata):
+        self.calldata = calldata
+
+
+class _Vm:
+    Return = _Return
+
+    class UserError(Exception):
+        pass
+
+    @staticmethod
+    def run_nondet_unsafe(leader_fn, validator_fn):
+        leader_value = leader_fn()
+        assert validator_fn(_Return(leader_value))
+        return leader_value
+
+
+class _Web:
+    @staticmethod
+    def render(_url, mode="text"):
+        assert mode == "text"
+        return "README SECURITY.md ML-KEM"
+
+
+class _Nondet:
+    web = _Web()
+
+    @staticmethod
+    def exec_prompt(_task, response_format=None):
+        assert response_format == "json"
+        assert "untrusted evidence" in _task
+        assert "Do not flag examples" in _task
+        return {
+            "readme_present": True,
+            "security_policy_present": True,
+            "risky_old_crypto_terms": [],
+            "post_quantum_terms": ["ML-KEM"],
+            "secret_like_terms": [],
+            "evidence_quality": "ENOUGH",
+        }
+
+
+class _EqPrinciple:
+    @staticmethod
+    def prompt_comparative(leader_fn, principle):
+        assert "materially equivalent" in principle
+        return leader_fn()
+
+
 class _Gl:
     Contract = object
     public = _Public()
-
-    class vm:
-        class UserError(Exception):
-            pass
+    vm = _Vm
+    nondet = _Nondet()
+    eq_principle = _EqPrinciple()
 
 
 def _allow_storage(cls):
@@ -143,6 +192,39 @@ def test_recommended_fixes_prioritize_detected_gaps():
     assert "SECURITY.md" in fixes[0]
     assert "weak crypto" in fixes[1]
     assert "secret-like" in fixes[2]
+
+
+def test_nondeterministic_analysis_validates_stable_decisions():
+    contract = _contract()
+
+    analysis = contract._analyze_public_evidence(
+        "https://github.com/example/repo"
+    )
+
+    assert analysis["readme_present"] is True
+    assert analysis["security_policy_present"] is True
+    assert analysis["post_quantum_terms"] == ["ML-KEM"]
+
+
+def test_verdict_and_summary_are_derived_from_validated_signals():
+    contract = _contract()
+    analysis = {
+        "readme_present": True,
+        "security_policy_present": False,
+        "risky_old_crypto_terms": ["SHA1"],
+        "post_quantum_terms": [],
+        "secret_like_terms": [],
+        "evidence_quality": "ENOUGH",
+    }
+    score = contract._score(analysis)
+    risk_level = contract._risk_level(score)
+
+    summary = contract._evidence_summary(analysis)
+    verdict = contract._verdict(score, risk_level, analysis)
+
+    assert "security policy not found" in summary
+    assert "legacy crypto references found" in summary
+    assert f"{risk_level} risk ({score}/100)" in verdict
 
 
 def test_scan_view_serializes_storage_result():

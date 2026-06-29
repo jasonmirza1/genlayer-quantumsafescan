@@ -271,8 +271,8 @@ export function AccountPanel() {
           <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
             <p className="text-xs text-muted-foreground">
               Use &quot;Switch Account&quot; to select a different MetaMask
-              account. Use &quot;Disconnect&quot; to remove this site from
-              MetaMask.
+              account. &quot;Disconnect&quot; clears this app&apos;s local
+              connection state; site permissions remain managed in MetaMask.
             </p>
           </div>
         </div>
