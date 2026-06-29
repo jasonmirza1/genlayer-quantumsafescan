@@ -1,5 +1,5 @@
 {
-  "name": "genlayer-project",
+  "name": "quantum-safe-scan-lite",
   "type": "module",
   "private": true,
   "workspaces": ["frontend"],

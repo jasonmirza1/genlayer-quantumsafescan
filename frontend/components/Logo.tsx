@@ -55,7 +55,7 @@ export function Logo({
   const Wordmark = () => (
     <span
       className={`${textSize} font-bold ${colorClass} font-[family-name:var(--font-display)] transition-colors`}
-      style={{ letterSpacing: '-0.02em' }}
+      style={{ letterSpacing: 0 }}
     >
       GenLayer
     </span>

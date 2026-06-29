@@ -12,10 +12,14 @@
 node_modules
 # Python bytecode
 __pycache__/
+.pytest_cache/
 *.pyc
 *.pyo
 *.pyd
 /context
+artifacts/
+dev-server.log
+dev-server.err
 /frontend/.next
 /frontend/next-env.d.ts
 /frontend/bun.lock

@@ -38,8 +38,8 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] glass-card rounded-2xl p-6 shadow-lg duration-200 data-[state=open]:animate-slide-up sm:rounded-2xl",
-        "border border-border/20",
+        "fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] rounded-lg bg-card/95 p-6 shadow-lg duration-200 data-[state=open]:animate-slide-up sm:rounded-lg",
+        "border border-border",
         className
       )}
       {...props}
@@ -89,7 +89,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-semibold uppercase tracking-wider leading-none",
+      "text-lg font-semibold uppercase tracking-normal leading-none",
       className
     )}
     {...props}

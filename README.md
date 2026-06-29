@@ -1,143 +1,214 @@
-# Sample GenLayer project
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/license/mit/)
-[![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?logo=discord&logoColor=white)](https://discord.gg/8Jm4v89VAu)
-[![Telegram](https://img.shields.io/badge/Telegram--T.svg?style=social&logo=telegram)](https://t.me/genlayer)
-[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/yeagerai.svg?style=social&label=Follow%20%40GenLayer)](https://x.com/GenLayer)
-[![GitHub star chart](https://img.shields.io/github/stars/yeagerai/genlayer-project-boilerplate?style=social)](https://star-history.com/#yeagerai/genlayer-js)
+# QuantumSafeScan Lite
 
-## About
-This project includes the boilerplate code for a GenLayer use case implementation, specifically a football bets game.
+AI Security & Quantum Readiness Scanner on GenLayer.
 
-## What's included
-- An example intelligent contract (Football Bets) with web access and LLM integration
-- **Direct mode tests** — fast, in-memory unit tests with web/LLM mocking (~ms per test)
-- **Integration tests** — full end-to-end tests against GenLayer Studio
-- **Contract linting** — static analysis to catch common contract issues before deployment
-- **CI pipeline** — GitHub Actions workflow for linting and direct tests
-- A production-ready Next.js 15 frontend with TypeScript, TanStack Query, and Radix UI
-- Configuration file template and deployment scripts
+QuantumSafeScan Lite is a GenLayer Builder project that scans public GitHub repository evidence and stores a validator-verifiable security verdict in a GenLayer Intelligent Contract. It is intentionally small, but it is not a hello-world: the useful work happens inside the contract through public web evidence, LLM judgment, equivalence checking, and persistent state.
 
-## Requirements
-- Python >= 3.12
-- [GenLayer CLI](https://github.com/genlayerlabs/genlayer-cli) globally installed: `npm install -g genlayer`
-- GenLayer Studio (for integration tests and deployment): Install from [Docs](https://docs.genlayer.com/developers/intelligent-contracts/tooling-setup#using-the-genlayer-studio) or use the hosted [GenLayer Studio](https://studio.genlayer.com/)
+## What It Does
 
-## Project Structure
+1. A user connects a wallet in the frontend.
+2. The user enters a public GitHub repository URL.
+3. The frontend submits the URL to the `QuantumSafeScan` Intelligent Contract.
+4. The contract renders public GitHub evidence, asks an LLM to normalize security signals, and requires validator agreement through `gl.eq_principle.strict_eq`.
+5. The contract stores the latest scan for the caller with:
+   - `target_url`
+   - `score` from 0 to 100
+   - `risk_level`: `LOW`, `MEDIUM`, or `HIGH`
+   - `verdict`
+   - `recommended_fixes`
+   - `block_info` scan index
+6. The frontend displays the latest stored scan, contract address, and transaction hash when available.
 
+## Why GenLayer
+
+Repository security posture is not a simple deterministic calculation. Public evidence can be missing, ambiguous, or spread across README, security policy pages, and project text. GenLayer is useful here because validators can independently render web evidence, use AI to judge the evidence, and agree on a normalized result before it becomes contract state.
+
+The MVP uses GenLayer for:
+
+- Python Intelligent Contract logic
+- Public write method: `submit_scan(target_url)`
+- Public view methods: `get_latest_scan(user_address)`, `get_scan(scan_id)`, `get_scan_count()`
+- Persistent `TreeMap` storage
+- Public web rendering via `gl.nondet.web.render`
+- LLM extraction via `gl.nondet.exec_prompt`
+- Validator equivalence with `gl.eq_principle.strict_eq`
+
+## Contract
+
+The contract lives at:
+
+```text
+contracts/quantum_safe_scan.py
 ```
-contracts/              # Python intelligent contracts
-tests/
-  direct/               # Fast in-memory tests (no Studio required)
-    test_create_bet.py   # Bet creation logic
-    test_resolve_bet.py  # Bet resolution with web/LLM mocks
-    test_views.py        # Read-only view methods
-  integration/           # Full tests against GenLayer Studio
-    test_football_bets.py
-    fixtures.py          # Expected state fixtures
-frontend/               # Next.js 15 app (TypeScript, TanStack Query, Radix UI)
-deploy/                 # TypeScript deployment scripts
-gltest.config.yaml      # Test runner network configuration
-pyproject.toml          # Python/pytest configuration
-.github/workflows/      # CI pipeline
-```
 
-## Quick Start
+The contract accepts only HTTPS GitHub repository URLs. It normalizes URLs to `https://github.com/{owner}/{repo}` before scanning.
 
-### 1. Set up Python environment
+Signals checked by the LLM prompt:
+
+- README or useful public repository overview
+- SECURITY.md, security policy, or responsible disclosure evidence
+- Risky old crypto terms: `MD5`, `SHA1`, `RSA-1024`, `DES`, `3DES`
+- Modern/post-quantum terms: `Kyber`, `Dilithium`, `ML-KEM`, `ML-DSA`, `post-quantum`, `PQC`
+- Secret-like public indicators: `api_key`, `private_key`, `secret`, `token`
+- Whether public evidence is strong enough for a useful verdict
+
+## Scoring
+
+The score starts at 70.
+
+Add:
+
+- `+10` README or useful public evidence
+- `+10` security policy evidence
+- `+10` post-quantum readiness terms
+
+Subtract:
+
+- `-15` risky old crypto terms
+- `-15` secret-like indicators
+- `-10` weak or unavailable evidence
+
+The score is clamped between 0 and 100.
+
+Risk levels:
+
+- `LOW`: score >= 75
+- `MEDIUM`: score >= 45 and < 75
+- `HIGH`: score < 45
+
+## Run Locally
+
+Requirements:
+
+- Python 3.12+
+- Node.js and npm
+- GenLayer CLI: `npm install -g genlayer`
+- GenLayer Studio local or hosted
+
+Install dependencies:
 
 ```shell
-python3 -m venv .venv
-source .venv/bin/activate
+npm install
 pip install -r requirements.txt
 ```
 
-### 2. Lint your contracts
-
-Run the GenVM linter to catch issues before deployment:
+Run the frontend:
 
 ```shell
-genvm-lint check contracts/football_bets.py
-```
-
-The linter catches:
-- Forbidden imports and non-deterministic calls
-- Invalid storage types (must use `TreeMap`, `DynArray`, `u256`, etc.)
-- Missing decorators and return type annotations
-- Non-deterministic operations outside equivalence principle blocks
-- And [20+ other rules](https://github.com/genlayerlabs/genvm-linter)
-
-### 3. Run direct mode tests
-
-Direct mode tests run contracts in-memory without needing GenLayer Studio. They use mocks for web requests and LLM calls, giving you fast feedback (~milliseconds per test):
-
-```shell
-pytest tests/direct/ -v
-```
-
-Direct mode features used in these tests:
-- `direct_deploy("contracts/file.py")` — deploy contract in memory
-- `direct_vm.sender = address` — set transaction sender
-- `direct_vm.mock_web(pattern, response)` — mock HTTP/render calls
-- `direct_vm.mock_llm(pattern, response)` — mock LLM responses
-- `direct_vm.expect_revert("message")` — assert expected failures
-- `direct_vm.clear_mocks()` — reset mocks between calls
-
-### 4. Deploy the contract
-
-1. Choose your network: `genlayer network`
-2. Deploy: `genlayer deploy` (runs the script in `/deploy/deployScript.ts`)
-
-### 5. Run integration tests
-
-Integration tests deploy the contract to GenLayer Studio and test with real consensus:
-
-```shell
-gltest tests/integration/ -v -s
-```
-
-These require GenLayer Studio running (local or hosted).
-
-### 6. Set up the frontend
-
-1. Copy `frontend/.env.example` to `frontend/.env`
-2. Add your deployed contract address as `NEXT_PUBLIC_CONTRACT_ADDRESS`
-3. Run:
-
-```shell
-cd frontend
-npm install
 npm run dev
 ```
 
-The app will be available at http://localhost:3000/.
+The app runs at:
 
-## How the Football Bets Contract Works
+```text
+http://localhost:3000
+```
 
-1. **Creating Bets**: Users bet on a football match by providing the game date, teams, and predicted winner.
-2. **Resolving Bets**: After the match, the contract fetches results from BBC Sport, uses an LLM to extract the score, and validates via the equivalence principle.
-3. **Points**: Correct predictions earn points. Users can query their points or the leaderboard.
+## Test
 
-## Testing Strategy
+Run the focused contract logic tests:
 
-| Test Type | Command | Speed | Requires Studio |
-|-----------|---------|-------|-----------------|
-| **Lint** | `genvm-lint check contracts/*.py` | ~250ms | No |
-| **Direct** | `pytest tests/direct/ -v` | ~ms/test | No |
-| **Integration** | `gltest tests/integration/ -v -s` | ~min/test | Yes |
+```shell
+pytest tests/direct/test_quantum_safe_scan.py -v
+```
 
-**Recommended workflow:**
-1. Lint after every contract change
-2. Run direct tests frequently during development
-3. Run integration tests before deployment to verify consensus behavior
+Run the frontend type/build check:
 
-For AI coding agents (Claude Code, Cursor, etc.), the linter and direct tests provide the fast feedback loop needed for iterative development without requiring a running Studio instance.
+```shell
+npm run build
+```
 
-## Community
-- **[Discord](https://discord.gg/8Jm4v89VAu)**: Discussions, support, and announcements
-- **[Telegram](https://t.me/genlayer)**: Informal chats and quick updates
+Optional contract lint:
 
-## Documentation
-For detailed information, see our [documentation](https://docs.genlayer.com/).
+```shell
+genvm-lint check contracts/quantum_safe_scan.py
+```
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Deploy To GenLayer Studio
+
+The deployment script now points at `contracts/quantum_safe_scan.py`.
+
+Latest deployment:
+
+- Network: Genlayer Studio Network (`studionet`)
+- Chain ID: `61999`
+- RPC: `https://studio.genlayer.com/api`
+- Contract address: `0x125A819C23c8f293Af98CcF320FeCFfE29B1820B`
+- Deployment transaction hash: `0xc85d1d8db351e24f574e105523dd5b70c99358d16f9639436ce703c0d77c590a`
+- Explorer link: TODO - the configured explorer endpoint returned `DEPLOYMENT_PAUSED` during verification
+
+1. Select the target network:
+
+```shell
+genlayer network
+```
+
+2. Deploy:
+
+```shell
+npm run deploy
+```
+
+3. Copy the deployed contract address into:
+
+```text
+frontend/.env
+```
+
+using:
+
+```text
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x125A819C23c8f293Af98CcF320FeCFfE29B1820B
+```
+
+4. Restart the frontend.
+
+For Bradbury or another supported GenLayer network, use the network options exposed by your installed GenLayer CLI and then run the same deploy script.
+
+## Frontend
+
+The frontend lives in `frontend/` and uses the boilerplate stack:
+
+- Next.js
+- TypeScript
+- TanStack Query
+- MetaMask wallet connection
+- `genlayer-js`
+
+Main scanner files:
+
+- `frontend/components/QuantumSafeScanner.tsx`
+- `frontend/lib/contracts/QuantumSafeScan.ts`
+- `frontend/lib/hooks/useQuantumSafeScan.ts`
+
+## Screenshots
+
+Add screenshots under:
+
+```text
+screenshots/
+```
+
+Suggested screenshots:
+
+- Wallet connected with the scanner form visible
+- Scan transaction pending or accepted
+- Latest result showing score, risk level, verdict, fixes, contract address, and transaction hash
+
+## Demo Video
+
+TODO: Add demo video link after deployment.
+
+## Submission
+
+See `SUBMISSION.md` for a GenLayer Portal submission draft.
+
+## Safety Note
+
+This project does not claim tokens, airdrops, rewards, or guaranteed portal points. It does not require private keys in code. Do not commit `.env`, wallet secrets, API keys, seed phrases, or private deployment credentials.
+
+## Research Links
+
+- GenLayer docs: https://docs.genlayer.com/
+- GenLayer project boilerplate: https://github.com/genlayerlabs/genlayer-project-boilerplate
+- GenLayer Portal: https://portal.genlayer.foundation/

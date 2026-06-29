@@ -1,7 +1,7 @@
 {
-  "name": "genlayer-football-betting",
+  "name": "quantum-safe-scan-lite",
   "version": "1.0.0",
-  "description": "GenLayer Football Betting - AI-powered prediction betting on GenLayer blockchain.",
+  "description": "QuantumSafeScan Lite - AI security and quantum readiness scanner on GenLayer.",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",

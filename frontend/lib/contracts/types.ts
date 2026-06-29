@@ -31,3 +31,15 @@ export interface BetFilters {
   resolved?: boolean;
   owner?: string;
 }
+
+export interface ScanResult {
+  id: string;
+  submitted_by: string;
+  target_url: string;
+  score: number;
+  risk_level: "LOW" | "MEDIUM" | "HIGH";
+  verdict: string;
+  evidence_summary: string;
+  recommended_fixes: string[];
+  block_info: string;
+}
