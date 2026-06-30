@@ -1,5 +1,11 @@
 # GenLayer Portal Submission
 
+## Portal Submission
+
+- Submission ID: `9611d5ca-093d-42ca-9002-36d6b2909b04`
+- Submitted: June 30, 2026
+- Status: Pending Review
+
 ## Ready-To-Copy Portal Text
 
 Contribution Type:
