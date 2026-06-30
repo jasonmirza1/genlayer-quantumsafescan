@@ -1,5 +1,5 @@
 import { createClient } from "genlayer-js";
-import { studionet } from "genlayer-js/chains";
+import { GENLAYER_CHAIN } from "../genlayer/client";
 import type { ScanResult, TransactionReceipt } from "./types";
 import {
   estimateWriteFeePreset,
@@ -126,7 +126,7 @@ class QuantumSafeScan {
     this.studioUrl = studioUrl;
 
     const config: any = {
-      chain: studionet,
+      chain: GENLAYER_CHAIN,
     };
 
     if (address) {
@@ -142,7 +142,7 @@ class QuantumSafeScan {
 
   updateAccount(address: string): void {
     const config: any = {
-      chain: studionet,
+      chain: GENLAYER_CHAIN,
       account: address as `0x${string}`,
     };
 

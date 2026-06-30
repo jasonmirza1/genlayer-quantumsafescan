@@ -124,11 +124,22 @@ Optional contract lint:
 genvm-lint check contracts/quantum_safe_scan.py
 ```
 
-## Deploy To GenLayer Studio
+## Deploy To GenLayer Bradbury
 
 The deployment script now points at `contracts/quantum_safe_scan.py`.
 
-Latest deployment:
+Primary deployment:
+
+- Network: Genlayer Bradbury Testnet (`testnet-bradbury`)
+- Chain ID: `4221`
+- RPC: `https://rpc-bradbury.genlayer.com`
+- Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
+- Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`
+- Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
+- Transaction explorer link: https://explorer-bradbury.genlayer.com/tx/0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454
+- Verification: deployment execution `SUCCESS`; on-chain scan count `0`
+
+Previous Studio deployment / backup:
 
 - Network: Genlayer Studio Network (`studionet`)
 - Chain ID: `61999`
@@ -137,12 +148,12 @@ Latest deployment:
 - Deployment transaction hash: `0x18597d54c6fe2952054e40ade9248f14d7ad8cb505477271531a41fe7f479545`
 - Verified scan transaction hash: `0xba2f0c71321a6e1a4cfc45a2f10b318ac3b23131eff64ad73a172ae411d52804`
 - Verification: deployment execution `SUCCESS`; scan consensus `MAJORITY_AGREE`; on-chain scan count `1`
-- Explorer link: TODO - the configured explorer endpoint returned `DEPLOYMENT_PAUSED` during verification
+- Explorer link: TODO - the configured Studio explorer endpoint returned `DEPLOYMENT_PAUSED` during verification
 
 1. Select the target network:
 
 ```shell
-genlayer network
+genlayer network set testnet-bradbury
 ```
 
 2. Deploy:
@@ -160,12 +171,10 @@ frontend/.env
 using:
 
 ```text
-NEXT_PUBLIC_CONTRACT_ADDRESS=0x3D94a8437F37f6cd49086CA1c44c4202Ff979436
+NEXT_PUBLIC_CONTRACT_ADDRESS=0xfdD81CD278e82151ce213863EEae8059C0136eC6
 ```
 
 4. Restart the frontend.
-
-For Bradbury or another supported GenLayer network, use the network options exposed by your installed GenLayer CLI and then run the same deploy script.
 
 ## Frontend
 

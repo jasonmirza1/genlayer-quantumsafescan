@@ -37,12 +37,12 @@ export default function HomePage() {
             GenLayer
           </a>
           <a
-            href="https://studio.genlayer.com"
+            href="https://explorer-bradbury.genlayer.com"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-accent transition-colors"
           >
-            Studio
+            Bradbury Explorer
           </a>
           <a
             href="https://docs.genlayer.com"

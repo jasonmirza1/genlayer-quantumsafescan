@@ -19,8 +19,8 @@ cp frontend/.env.example frontend/.env
 Configure:
 
 - `NEXT_PUBLIC_CONTRACT_ADDRESS` - deployed `QuantumSafeScan` contract address
-- `NEXT_PUBLIC_GENLAYER_RPC_URL` - GenLayer RPC URL, default `https://studio.genlayer.com/api`
-- `NEXT_PUBLIC_GENLAYER_CHAIN_ID` - default `61999`
+- `NEXT_PUBLIC_GENLAYER_RPC_URL` - GenLayer Bradbury RPC URL, default `https://rpc-bradbury.genlayer.com`
+- `NEXT_PUBLIC_GENLAYER_CHAIN_ID` - Bradbury chain ID, default `4221`
 
 ## Development
 

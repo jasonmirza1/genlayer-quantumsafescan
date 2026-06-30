@@ -108,9 +108,19 @@ export function QuantumSafeScanner() {
           {isConnected && !isOnCorrectNetwork ? (
             <Alert>
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Switch to GenLayer Studio</AlertTitle>
+              <AlertTitle>Switch to GenLayer Bradbury</AlertTitle>
               <AlertDescription>
                 Change the connected wallet network before running a scan.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          {!contractAddress ? (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Bradbury contract not configured</AlertTitle>
+              <AlertDescription>
+                Deploy the contract to Bradbury and set NEXT_PUBLIC_CONTRACT_ADDRESS.
               </AlertDescription>
             </Alert>
           ) : null}
@@ -123,6 +133,7 @@ export function QuantumSafeScanner() {
             disabled={
               !isConnected ||
               !isOnCorrectNetwork ||
+              !contractAddress ||
               !isValidGithubUrl ||
               submitScan.isSubmitting
             }
@@ -174,7 +185,7 @@ export function QuantumSafeScanner() {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Contract unavailable</AlertTitle>
             <AlertDescription>
-              The configured contract could not be read on GenLayer Studio.
+              The configured contract could not be read on GenLayer Bradbury.
             </AlertDescription>
           </Alert>
         ) : latestScan.isLoading ? (

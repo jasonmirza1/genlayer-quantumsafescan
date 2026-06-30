@@ -1,5 +1,5 @@
 import { createClient } from "genlayer-js";
-import { studionet } from "genlayer-js/chains";
+import { GENLAYER_CHAIN } from "../genlayer/client";
 import type { Bet, LeaderboardEntry, TransactionReceipt } from "./types";
 import {
   estimateWriteFeePreset,
@@ -25,7 +25,7 @@ class FootballBets {
     this.studioUrl = studioUrl;
 
     const config: any = {
-      chain: studionet,
+      chain: GENLAYER_CHAIN,
     };
 
     if (address) {
@@ -44,7 +44,7 @@ class FootballBets {
    */
   updateAccount(address: string): void {
     const config: any = {
-      chain: studionet,
+      chain: GENLAYER_CHAIN,
       account: address as `0x${string}`,
     };
 

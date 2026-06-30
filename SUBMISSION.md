@@ -3,10 +3,10 @@
 ## Ready-To-Copy Portal Text
 
 Contribution Type:
-Builder → Projects
+Builder -> Projects
 
 Title:
-QuantumSafeScan Lite — AI Security & Quantum Readiness Scanner on GenLayer
+QuantumSafeScan Lite - AI Security & Quantum Readiness Scanner on GenLayer
 
 Description under 1000 characters:
 QuantumSafeScan Lite is a GenLayer-powered AI security and quantum-readiness scanner for public GitHub repositories. Users connect a wallet, submit a GitHub repo URL, and the app calls a GenLayer Intelligent Contract to evaluate public repository overview and security-policy evidence for weak crypto references like MD5/SHA1/RSA-1024, possible secret-related patterns, and post-quantum signals like PQC, ML-KEM, Kyber, or Dilithium. GenLayer is central because validators semantically verify the AI evidence judgment instead of trusting a centralized backend. The contract stores a structured result with score, risk level, verdict, evidence summary, and recommended fixes.
@@ -15,25 +15,33 @@ Evidence:
 
 - GitHub repo URL: https://github.com/jasonmirza1/genlayer-quantumsafescan
 - Demo video URL: TODO
-- Contract address: `0x3D94a8437F37f6cd49086CA1c44c4202Ff979436`
-- Transaction link: TODO - configured explorer is currently unavailable
-- Deployment transaction hash: `0x18597d54c6fe2952054e40ade9248f14d7ad8cb505477271531a41fe7f479545`
-- Verified scan transaction hash: `0xba2f0c71321a6e1a4cfc45a2f10b318ac3b23131eff64ad73a172ae411d52804`
+- Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
+- Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
+- Transaction link: https://explorer-bradbury.genlayer.com/tx/0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454
+- Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`
+- Verified scan transaction hash: TODO - run a Bradbury scan from the frontend after connecting the wallet
 - Screenshot folder: `screenshots/`
 
 ## Deployment
 
+- Network alias: `testnet-bradbury`
+- Network name: Genlayer Bradbury Testnet
+- Chain ID: `4221`
+- RPC: `https://rpc-bradbury.genlayer.com`
+- Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
+- Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
+- Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`
+- Deployment transaction link: https://explorer-bradbury.genlayer.com/tx/0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454
+- Deployment execution: `SUCCESS`
+- Verified on-chain scan count: `0`
+
+Previous Studio deployment / backup:
+
 - Network alias: `studionet`
-- Network name: Genlayer Studio Network
-- Chain ID: `61999`
-- RPC: `https://studio.genlayer.com/api`
 - Contract address: `0x3D94a8437F37f6cd49086CA1c44c4202Ff979436`
 - Deployment transaction hash: `0x18597d54c6fe2952054e40ade9248f14d7ad8cb505477271531a41fe7f479545`
 - Verified scan transaction hash: `0xba2f0c71321a6e1a4cfc45a2f10b318ac3b23131eff64ad73a172ae411d52804`
-- Deployment execution: `SUCCESS`
 - Scan consensus: `MAJORITY_AGREE`
-- Verified on-chain scan count: `1`
-- Explorer link: TODO - `https://genlayer-explorer.vercel.app` returned `DEPLOYMENT_PAUSED`
 
 ## Problem
 
@@ -58,7 +66,7 @@ QuantumSafeScan Lite lets a wallet-connected user submit a public GitHub reposit
 
 - Live demo URL
 - Demo video URL
-- Transaction/explorer URL when the explorer is available
+- Bradbury scan transaction hash after a frontend scan
 - Final screenshot filenames
 
 ## Safety Note
