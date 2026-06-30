@@ -170,7 +170,8 @@ class QuantumSafeScan {
 
   async submitScan(
     targetUrl: string,
-    feePreset?: FeePresetEstimate
+    feePreset?: FeePresetEstimate,
+    onSubmitted?: (transactionHash: string) => void
   ): Promise<TransactionReceipt> {
     const fees = feePresetToTransactionFees(feePreset);
     const txHash = await this.client.writeContract({
@@ -180,6 +181,8 @@ class QuantumSafeScan {
       value: BigInt(0),
       ...(fees ? { fees } : {}),
     });
+
+    onSubmitted?.(txHash);
 
     const receipt = await this.client.waitForTransactionReceipt({
       hash: txHash,

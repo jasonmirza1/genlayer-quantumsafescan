@@ -44,7 +44,11 @@ export function QuantumSafeScanner() {
   const contractAddress = getContractAddress();
 
   const receipt = submitScan.data as any;
-  const txHash = receipt?.hash || receipt?.transactionHash || receipt?.txHash;
+  const txHash =
+    submitScan.transactionHash ||
+    receipt?.hash ||
+    receipt?.transactionHash ||
+    receipt?.txHash;
 
   const isValidGithubUrl = useMemo(() => {
     return (
@@ -125,6 +129,17 @@ export function QuantumSafeScanner() {
             </Alert>
           ) : null}
 
+          {submitScan.isSubmitting && submitScan.transactionHash ? (
+            <Alert>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <AlertTitle>Waiting for GenLayer consensus</AlertTitle>
+              <AlertDescription>
+                The transaction is on Bradbury. AI validator consensus can take
+                several minutes; do not submit it again.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
           <Button
             type="submit"
             variant="gradient"
@@ -143,7 +158,11 @@ export function QuantumSafeScanner() {
             ) : (
               <ScanLine className="h-4 w-4" />
             )}
-            {submitScan.isSubmitting ? "Scanning..." : "Run Scan"}
+            {submitScan.isSubmitting
+              ? submitScan.transactionHash
+                ? "Awaiting consensus..."
+                : "Submitting..."
+              : "Run Scan"}
           </Button>
         </form>
 
@@ -162,9 +181,20 @@ export function QuantumSafeScanner() {
           </div>
           <div className="rounded-md border border-white/10 p-4">
             <p className="text-xs text-muted-foreground">Last tx</p>
-            <p className="text-sm font-mono break-all">
-              {txHash || "Pending scan"}
-            </p>
+            {txHash ? (
+              <a
+                href={`https://explorer-bradbury.genlayer.com/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-mono break-all text-accent hover:underline"
+              >
+                {txHash}
+              </a>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No scan submitted
+              </p>
+            )}
           </div>
         </div>
       </section>

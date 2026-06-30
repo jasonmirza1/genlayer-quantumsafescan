@@ -40,6 +40,7 @@ export function useLatestScan(address: string | null) {
     },
     enabled: !!contract && !!address,
     refetchOnWindowFocus: true,
+    refetchInterval: address ? 10000 : false,
     staleTime: 2000,
   });
 }
@@ -66,6 +67,7 @@ export function useSubmitScan() {
   const { address } = useWallet();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -85,11 +87,12 @@ export function useSubmitScan() {
       }
 
       setIsSubmitting(true);
+      setTransactionHash(null);
       const feePreset = await contract.estimateSubmitScanFees(
         targetUrl,
         feePresetLevel ?? "standard"
       );
-      return contract.submitScan(targetUrl, feePreset);
+      return contract.submitScan(targetUrl, feePreset, setTransactionHash);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["latestScan"] });
@@ -110,6 +113,7 @@ export function useSubmitScan() {
   return {
     ...mutation,
     isSubmitting,
+    transactionHash,
     submitScan: mutation.mutate,
     submitScanAsync: mutation.mutateAsync,
   };
