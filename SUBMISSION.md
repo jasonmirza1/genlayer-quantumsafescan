@@ -14,7 +14,7 @@ QuantumSafeScan Lite is a GenLayer-powered AI security and quantum-readiness sca
 Evidence:
 
 - GitHub repo URL: https://github.com/jasonmirza1/genlayer-quantumsafescan
-- Demo video URL: TODO
+- Demo video URL: https://youtu.be/2UdHXMNzuDA
 - Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
 - Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
 - Transaction link: https://explorer-bradbury.genlayer.com/tx/0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454
@@ -69,7 +69,6 @@ QuantumSafeScan Lite lets a wallet-connected user submit a public GitHub reposit
 ## Manual Links Still Required
 
 - Live demo URL
-- Demo video URL
 - Final screenshot filenames
 
 ## Safety Note
