@@ -200,13 +200,24 @@ class QuantumSafeScan {
       return null;
     }
 
-    const scan = await this.client.readContract({
-      address: this.contractAddress,
-      functionName: "get_latest_scan",
-      args: [address],
-    });
+    const scanCount = await this.getScanCount();
+    const oldestScanId = Math.max(1, scanCount - 49);
 
-    return normalizeScan(scan);
+    for (let scanId = scanCount; scanId >= oldestScanId; scanId -= 1) {
+      const scan = normalizeScan(
+        await this.client.readContract({
+          address: this.contractAddress,
+          functionName: "get_scan",
+          args: [String(scanId)],
+        })
+      );
+
+      if (scan?.submitted_by.toLowerCase() === address.toLowerCase()) {
+        return scan;
+      }
+    }
+
+    return null;
   }
 
   async getScanCount(): Promise<number> {

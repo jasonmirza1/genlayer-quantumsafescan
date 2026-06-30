@@ -19,7 +19,10 @@ Evidence:
 - Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
 - Transaction link: https://explorer-bradbury.genlayer.com/tx/0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454
 - Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`
-- Verified scan transaction hash: TODO - run a Bradbury scan from the frontend after connecting the wallet
+- Verified scan transaction hash: `0x2c014879834bc07af3cca93bd42c220374b9dbe2232bad18e7280b31087fd661`
+- Verified scan transaction link: https://explorer-bradbury.genlayer.com/tx/0x2c014879834bc07af3cca93bd42c220374b9dbe2232bad18e7280b31087fd661
+- Finalization transaction hash: `0x892d08d2ab19937721676feb4a26690de633c0815c0c4934bd5e4c6427268b37`
+- Finalization transaction link: https://explorer-bradbury.genlayer.com/tx/0x892d08d2ab19937721676feb4a26690de633c0815c0c4934bd5e4c6427268b37
 - Screenshot folder: `screenshots/`
 
 ## Deployment
@@ -33,7 +36,8 @@ Evidence:
 - Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`
 - Deployment transaction link: https://explorer-bradbury.genlayer.com/tx/0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454
 - Deployment execution: `SUCCESS`
-- Verified on-chain scan count: `0`
+- Verified on-chain scan count: `1`
+- Verified result: score `90`, risk `LOW`, consensus `AGREE`, execution `FINISHED_WITH_RETURN`
 
 Previous Studio deployment / backup:
 
@@ -66,7 +70,6 @@ QuantumSafeScan Lite lets a wallet-connected user submit a public GitHub reposit
 
 - Live demo URL
 - Demo video URL
-- Bradbury scan transaction hash after a frontend scan
 - Final screenshot filenames
 
 ## Safety Note
