@@ -117,54 +117,94 @@ export function AccountPanel() {
     }
   };
 
-  const detectedWalletLabels = availableWallets.map((wallet) =>
-    `${wallet.id} ${wallet.name} ${wallet.rdns ?? ""}`.toLowerCase()
-  );
-  const undetectedWallets = SUPPORTED_EVM_WALLETS.filter(
-    (supportedWallet) =>
-      !detectedWalletLabels.some((label) =>
-        label.includes(supportedWallet.match)
+  const findDetectedWallet = (match: string) =>
+    availableWallets.find((wallet) =>
+      `${wallet.id} ${wallet.name} ${wallet.rdns ?? ""}`
+        .toLowerCase()
+        .includes(match)
+    );
+
+  const supportedWalletCards = SUPPORTED_EVM_WALLETS.map((supportedWallet) => ({
+    ...supportedWallet,
+    detectedWallet: findDetectedWallet(supportedWallet.match),
+  }));
+
+  const extraDetectedWallets = availableWallets.filter(
+    (wallet) =>
+      !SUPPORTED_EVM_WALLETS.some((supportedWallet) =>
+        `${wallet.id} ${wallet.name} ${wallet.rdns ?? ""}`
+          .toLowerCase()
+          .includes(supportedWallet.match)
       )
   );
 
   const walletOptions = (
     <div className="space-y-2">
-      {availableWallets.map((wallet) => {
-        const selected = wallet.id === selectedWalletId;
+      {supportedWalletCards.map((wallet) => {
+        const detectedWallet = wallet.detectedWallet;
+        const selected = detectedWallet?.id === selectedWalletId;
 
         return (
           <Button
             key={wallet.id}
-            onClick={() => handleConnect(wallet.id)}
+            onClick={() =>
+              detectedWallet
+                ? handleConnect(detectedWallet.id)
+                : window.open(wallet.url, "_blank")
+            }
             variant={selected ? "gradient" : "outline"}
             className="w-full h-14 justify-start gap-3 text-base"
             disabled={isConnecting}
           >
-            <Wallet className="w-5 h-5 shrink-0" />
+            {detectedWallet ? (
+              <Wallet className="w-5 h-5 shrink-0" />
+            ) : (
+              <ExternalLink className="w-5 h-5 shrink-0" />
+            )}
             <span className="flex-1 text-left truncate">{wallet.name}</span>
+            {!detectedWallet && (
+              <span className="text-xs text-muted-foreground">Install</span>
+            )}
             {selected && <Check className="w-4 h-4 shrink-0" />}
           </Button>
         );
       })}
+
+      {extraDetectedWallets.length > 0 && (
+        <div className="pt-2 space-y-2">
+          <p className="text-sm text-muted-foreground">Other detected wallets</p>
+          {extraDetectedWallets.map((wallet) => {
+            const selected = wallet.id === selectedWalletId;
+
+            return (
+              <Button
+                key={wallet.id}
+                onClick={() => handleConnect(wallet.id)}
+                variant={selected ? "gradient" : "outline"}
+                className="w-full h-14 justify-start gap-3 text-base"
+                disabled={isConnecting}
+              >
+                <Wallet className="w-5 h-5 shrink-0" />
+                <span className="flex-1 text-left truncate">{wallet.name}</span>
+                {selected && <Check className="w-4 h-4 shrink-0" />}
+              </Button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 
-  const supportedWalletOptions = undetectedWallets.length > 0 && (
-    <div className="space-y-2">
-      <p className="text-sm text-muted-foreground">Other supported EVM wallets</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {undetectedWallets.map((wallet) => (
-          <Button
-            key={wallet.id}
-            onClick={() => window.open(wallet.url, "_blank")}
-            variant="outline"
-            className="h-12 justify-start gap-2"
-          >
-            <ExternalLink className="w-4 h-4 shrink-0" />
-            <span className="truncate">{wallet.name}</span>
-          </Button>
-        ))}
-      </div>
+  const supportedWalletSummary = (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {SUPPORTED_EVM_WALLETS.map((wallet) => (
+        <div
+          key={wallet.id}
+          className="rounded-md border border-white/10 bg-muted/10 px-3 py-2 text-xs text-muted-foreground"
+        >
+          {wallet.name}
+        </div>
+      ))}
     </div>
   );
 
@@ -228,7 +268,7 @@ export function AccountPanel() {
                   </AlertDescription>
                 </Alert>
 
-                {supportedWalletOptions}
+                {walletOptions}
 
                 <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
                   <p className="text-xs text-muted-foreground">
@@ -240,8 +280,6 @@ export function AccountPanel() {
             ) : (
               <>
                 {walletOptions}
-
-                {supportedWalletOptions}
 
                 {connectionError && (
                   <Alert variant="destructive">
@@ -260,6 +298,7 @@ export function AccountPanel() {
                     <li>Add the GenLayer network to your wallet</li>
                     <li>Switch to the GenLayer network</li>
                   </ol>
+                  <div className="mt-3">{supportedWalletSummary}</div>
                 </div>
               </>
             )}
