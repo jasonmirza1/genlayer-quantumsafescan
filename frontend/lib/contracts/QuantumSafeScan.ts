@@ -1,5 +1,5 @@
 import { createClient } from "genlayer-js";
-import { GENLAYER_CHAIN } from "../genlayer/client";
+import { GENLAYER_CHAIN, getEthereumProvider } from "../genlayer/client";
 import type { ScanResult, TransactionReceipt } from "./types";
 import {
   estimateWriteFeePreset,
@@ -131,6 +131,10 @@ class QuantumSafeScan {
 
     if (address) {
       config.account = address as `0x${string}`;
+      const provider = getEthereumProvider();
+      if (provider) {
+        config.provider = provider;
+      }
     }
 
     if (studioUrl) {
@@ -145,6 +149,11 @@ class QuantumSafeScan {
       chain: GENLAYER_CHAIN,
       account: address as `0x${string}`,
     };
+
+    const provider = getEthereumProvider();
+    if (provider) {
+      config.provider = provider;
+    }
 
     if (this.studioUrl) {
       config.endpoint = this.studioUrl;

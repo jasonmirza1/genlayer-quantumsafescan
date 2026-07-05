@@ -16,7 +16,7 @@ import {
 } from "./ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
-const METAMASK_INSTALL_URL = "https://metamask.io/download/";
+const WALLET_INSTALL_URL = "https://web3.okx.com/wallet";
 
 export function AccountPanel() {
   const {
@@ -47,13 +47,13 @@ export function AccountPanel() {
       setIsModalOpen(false);
     } catch (err: any) {
       console.error("Failed to connect wallet:", err);
-      setConnectionError(err.message || "Failed to connect to MetaMask");
+      setConnectionError(err.message || "Failed to connect to wallet");
 
       if (err.message?.includes("rejected")) {
         userRejected("Connection cancelled");
       } else {
         error("Failed to connect wallet", {
-          description: err.message || "Check your MetaMask and try again."
+          description: err.message || "Check your wallet extension and try again."
         });
       }
     } finally {
@@ -105,7 +105,7 @@ export function AccountPanel() {
               Connect to GenLayer
             </DialogTitle>
             <DialogDescription>
-              Connect your MetaMask wallet to run scans
+              Connect an EVM wallet to run scans
             </DialogDescription>
           </DialogHeader>
 
@@ -114,25 +114,25 @@ export function AccountPanel() {
               <>
                 <Alert variant="default" className="bg-accent/10 border-accent/20">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>MetaMask Not Detected</AlertTitle>
+                  <AlertTitle>Wallet Not Detected</AlertTitle>
                   <AlertDescription>
-                    Please install MetaMask to continue. MetaMask is a crypto
-                    wallet that allows you to interact with blockchain applications.
+                    Install or enable an EVM wallet extension. OKX Wallet is
+                    preferred when multiple wallets are available.
                   </AlertDescription>
                 </Alert>
 
                 <Button
-                  onClick={() => window.open(METAMASK_INSTALL_URL, "_blank")}
+                  onClick={() => window.open(WALLET_INSTALL_URL, "_blank")}
                   variant="gradient"
                   className="w-full h-14 text-lg"
                 >
                   <ExternalLink className="w-5 h-5 mr-2" />
-                  Install MetaMask
+                  Install OKX Wallet
                 </Button>
 
                 <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
                   <p className="text-xs text-muted-foreground">
-                    After installing MetaMask, refresh this page and click
+                    After installing the wallet, refresh this page and click
                     &quot;Connect Wallet&quot; again.
                   </p>
                 </div>
@@ -146,7 +146,7 @@ export function AccountPanel() {
                   disabled={isConnecting}
                 >
                   <User className="w-5 h-5 mr-2" />
-                  {isConnecting ? "Connecting..." : "Connect MetaMask"}
+                  {isConnecting ? "Connecting..." : "Connect Wallet"}
                 </Button>
 
                 {connectionError && (
@@ -159,11 +159,11 @@ export function AccountPanel() {
 
                 <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
                   <p className="text-xs text-muted-foreground">
-                    This will open MetaMask and prompt you to:
+                    This will open OKX Wallet when available and prompt you to:
                   </p>
                   <ol className="text-xs text-muted-foreground list-decimal list-inside mt-2 space-y-1">
                     <li>Connect your wallet to this application</li>
-                    <li>Add the GenLayer network to MetaMask</li>
+                    <li>Add the GenLayer network to your wallet</li>
                     <li>Switch to the GenLayer network</li>
                   </ol>
                 </div>
@@ -199,7 +199,7 @@ export function AccountPanel() {
             Wallet Details
           </DialogTitle>
           <DialogDescription>
-            Your connected MetaMask wallet information
+            Your connected wallet information
           </DialogDescription>
         </DialogHeader>
 
@@ -233,7 +233,7 @@ export function AccountPanel() {
               <AlertTitle>Network Warning</AlertTitle>
               <AlertDescription>
                 You&apos;re not on the GenLayer network. Please switch networks in
-                MetaMask or try reconnecting.
+                your wallet or try reconnecting.
               </AlertDescription>
             </Alert>
           )}
@@ -270,9 +270,9 @@ export function AccountPanel() {
 
           <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
             <p className="text-xs text-muted-foreground">
-              Use &quot;Switch Account&quot; to select a different MetaMask
+              Use &quot;Switch Account&quot; to select a different wallet
               account. &quot;Disconnect&quot; clears this app&apos;s local
-              connection state; site permissions remain managed in MetaMask.
+              connection state; site permissions remain managed in your wallet.
             </p>
           </div>
         </div>

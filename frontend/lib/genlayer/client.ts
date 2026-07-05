@@ -24,15 +24,57 @@ export const GENLAYER_NETWORK = {
 // Ethereum provider type from window
 interface EthereumProvider {
   isMetaMask?: boolean;
+  isOkxWallet?: boolean;
+  isPhantom?: boolean;
+  providers?: EthereumProvider[];
   request: (args: { method: string; params?: any[] }) => Promise<any>;
   on: (event: string, handler: (...args: any[]) => void) => void;
   removeListener: (event: string, handler: (...args: any[]) => void) => void;
 }
 
+interface EIP6963ProviderDetail {
+  info: {
+    uuid: string;
+    name: string;
+    rdns: string;
+  };
+  provider: EthereumProvider;
+}
+
 declare global {
   interface Window {
     ethereum?: EthereumProvider;
+    okxwallet?: EthereumProvider;
   }
+}
+
+const announcedProviders: EIP6963ProviderDetail[] = [];
+let providerDiscoveryInitialized = false;
+
+function discoverInjectedProviders(): void {
+  if (typeof window === "undefined") return;
+
+  if (!providerDiscoveryInitialized) {
+    window.addEventListener(
+      "eip6963:announceProvider",
+      ((event: CustomEvent<EIP6963ProviderDetail>) => {
+        const detail = event.detail;
+        if (
+          detail?.provider &&
+          !announcedProviders.some(
+            (candidate) =>
+              candidate.info.uuid === detail.info.uuid ||
+              candidate.provider === detail.provider
+          )
+        ) {
+          announcedProviders.push(detail);
+        }
+      }) as EventListener
+    );
+    providerDiscoveryInitialized = true;
+  }
+
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
 }
 
 /**
@@ -60,8 +102,7 @@ export function getContractAddress(): string {
  * Check if MetaMask is installed
  */
 export function isMetaMaskInstalled(): boolean {
-  if (typeof window === "undefined") return false;
-  return !!window.ethereum?.isMetaMask;
+  return !!getEthereumProvider();
 }
 
 /**
@@ -69,7 +110,33 @@ export function isMetaMaskInstalled(): boolean {
  */
 export function getEthereumProvider(): EthereumProvider | null {
   if (typeof window === "undefined") return null;
-  return window.ethereum || null;
+
+  discoverInjectedProviders();
+
+  if (window.okxwallet?.request) {
+    return window.okxwallet;
+  }
+
+  const injectedOkx = window.ethereum?.providers?.find(
+    (provider) => provider.isOkxWallet
+  );
+  if (injectedOkx) {
+    return injectedOkx;
+  }
+
+  const announcedOkx = announcedProviders.find(
+    ({ info, provider }) =>
+      provider.isOkxWallet ||
+      info.name.toLowerCase().includes("okx") ||
+      info.rdns.toLowerCase().includes("okx")
+  );
+
+  return (
+    announcedOkx?.provider ||
+    window.ethereum ||
+    announcedProviders[0]?.provider ||
+    null
+  );
 }
 
 /**
@@ -305,6 +372,10 @@ export function createGenLayerClient(address?: string) {
 
   if (address) {
     config.account = address as `0x${string}`;
+    const provider = getEthereumProvider();
+    if (provider) {
+      config.provider = provider;
+    }
   }
 
   try {

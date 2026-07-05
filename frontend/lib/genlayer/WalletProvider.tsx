@@ -215,16 +215,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (err.message?.includes("rejected")) {
         userRejected("Connection cancelled");
       } else if (err.message?.includes("MetaMask is not installed")) {
-        error("MetaMask not found", {
-          description: "Please install MetaMask to connect your wallet.",
+        error("Wallet not found", {
+          description: "Please install or enable an EVM wallet extension.",
           action: {
-            label: "Install MetaMask",
-            onClick: () => window.open("https://metamask.io/download/", "_blank")
+            label: "Install OKX Wallet",
+            onClick: () => window.open("https://web3.okx.com/wallet", "_blank")
           }
         });
       } else {
         error("Failed to connect wallet", {
-          description: err.message || "Please check your MetaMask and try again."
+          description: err.message || "Please check your wallet extension and try again."
         });
       }
 
