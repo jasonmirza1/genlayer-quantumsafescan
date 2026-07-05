@@ -17,6 +17,50 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
 const WALLET_INSTALL_URL = "https://web3.okx.com/wallet";
+const SUPPORTED_EVM_WALLETS = [
+  {
+    id: "okx",
+    match: "okx",
+    name: "OKX Wallet",
+    url: WALLET_INSTALL_URL,
+  },
+  {
+    id: "metamask",
+    match: "metamask",
+    name: "MetaMask",
+    url: "https://metamask.io/download/",
+  },
+  {
+    id: "phantom",
+    match: "phantom",
+    name: "Phantom",
+    url: "https://phantom.com/download",
+  },
+  {
+    id: "coinbase",
+    match: "coinbase",
+    name: "Coinbase Wallet",
+    url: "https://www.coinbase.com/wallet/downloads",
+  },
+  {
+    id: "rabby",
+    match: "rabby",
+    name: "Rabby",
+    url: "https://rabby.io/",
+  },
+  {
+    id: "trust",
+    match: "trust",
+    name: "Trust Wallet",
+    url: "https://trustwallet.com/browser-extension",
+  },
+  {
+    id: "brave",
+    match: "brave",
+    name: "Brave Wallet",
+    url: "https://brave.com/wallet/",
+  },
+];
 
 export function AccountPanel() {
   const {
@@ -73,6 +117,16 @@ export function AccountPanel() {
     }
   };
 
+  const detectedWalletLabels = availableWallets.map((wallet) =>
+    `${wallet.id} ${wallet.name} ${wallet.rdns ?? ""}`.toLowerCase()
+  );
+  const undetectedWallets = SUPPORTED_EVM_WALLETS.filter(
+    (supportedWallet) =>
+      !detectedWalletLabels.some((label) =>
+        label.includes(supportedWallet.match)
+      )
+  );
+
   const walletOptions = (
     <div className="space-y-2">
       {availableWallets.map((wallet) => {
@@ -92,6 +146,25 @@ export function AccountPanel() {
           </Button>
         );
       })}
+    </div>
+  );
+
+  const supportedWalletOptions = undetectedWallets.length > 0 && (
+    <div className="space-y-2">
+      <p className="text-sm text-muted-foreground">Other supported EVM wallets</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {undetectedWallets.map((wallet) => (
+          <Button
+            key={wallet.id}
+            onClick={() => window.open(wallet.url, "_blank")}
+            variant="outline"
+            className="h-12 justify-start gap-2"
+          >
+            <ExternalLink className="w-4 h-4 shrink-0" />
+            <span className="truncate">{wallet.name}</span>
+          </Button>
+        ))}
+      </div>
     </div>
   );
 
@@ -155,14 +228,7 @@ export function AccountPanel() {
                   </AlertDescription>
                 </Alert>
 
-                <Button
-                  onClick={() => window.open(WALLET_INSTALL_URL, "_blank")}
-                  variant="gradient"
-                  className="w-full h-14 text-lg"
-                >
-                  <ExternalLink className="w-5 h-5 mr-2" />
-                  Install OKX Wallet
-                </Button>
+                {supportedWalletOptions}
 
                 <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
                   <p className="text-xs text-muted-foreground">
@@ -174,6 +240,8 @@ export function AccountPanel() {
             ) : (
               <>
                 {walletOptions}
+
+                {supportedWalletOptions}
 
                 {connectionError && (
                   <Alert variant="destructive">

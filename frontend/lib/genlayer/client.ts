@@ -22,6 +22,7 @@ export const GENLAYER_NETWORK = {
 };
 
 const ACTIVE_WALLET_PROVIDER_KEY = "active_wallet_provider";
+const DIRECT_WALLET_IDS = ["okx", "phantom", "coinbase", "rabby", "trust", "brave"];
 
 // Ethereum provider type from window
 export interface EthereumProvider {
@@ -61,6 +62,13 @@ declare global {
   interface Window {
     ethereum?: EthereumProvider;
     okxwallet?: EthereumProvider;
+    phantom?: {
+      ethereum?: EthereumProvider;
+    };
+    coinbaseWalletExtension?: EthereumProvider;
+    rabby?: EthereumProvider;
+    trustwallet?: EthereumProvider;
+    braveEthereum?: EthereumProvider;
   }
 }
 
@@ -169,7 +177,7 @@ function getWalletFingerprint(wallet: WalletProviderOption): string {
 
 function getWalletCandidateRank(wallet: WalletProviderOption): number {
   if (wallet.id.startsWith("eip6963:")) return 0;
-  if (wallet.id === "okx") return 1;
+  if (DIRECT_WALLET_IDS.includes(wallet.id)) return 1;
   if (wallet.rdns) return 2;
   return 3;
 }
@@ -239,12 +247,55 @@ export function getAvailableWalletProviders(): WalletProviderOption[] {
     });
   }
 
-  if (window.okxwallet?.request) {
-    addWalletCandidate(wallets, seenProviders, seenWallets, {
+  const directProviders: Array<{
+    id: string;
+    name: string;
+    provider?: EthereumProvider;
+    isPreferred?: boolean;
+  }> = [
+    {
       id: "okx",
       name: "OKX Wallet",
       provider: window.okxwallet,
       isPreferred: true,
+    },
+    {
+      id: "phantom",
+      name: "Phantom",
+      provider: window.phantom?.ethereum,
+    },
+    {
+      id: "coinbase",
+      name: "Coinbase Wallet",
+      provider: window.coinbaseWalletExtension,
+    },
+    {
+      id: "rabby",
+      name: "Rabby",
+      provider: window.rabby,
+    },
+    {
+      id: "trust",
+      name: "Trust Wallet",
+      provider: window.trustwallet,
+    },
+    {
+      id: "brave",
+      name: "Brave Wallet",
+      provider: window.braveEthereum,
+    },
+  ];
+
+  for (const directProvider of directProviders) {
+    if (!directProvider.provider?.request) {
+      continue;
+    }
+
+    addWalletCandidate(wallets, seenProviders, seenWallets, {
+      id: directProvider.id,
+      name: directProvider.name,
+      provider: directProvider.provider,
+      isPreferred: directProvider.isPreferred,
     });
   }
 
