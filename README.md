@@ -4,6 +4,8 @@ AI Security & Quantum Readiness Scanner on GenLayer.
 
 Demo video: https://youtu.be/2UdHXMNzuDA
 
+Live app: https://genlayer-quantumsafescan-jackmirza.vercel.app
+
 QuantumSafeScan Lite is a GenLayer Builder project that scans public GitHub repository evidence and stores a validator-verifiable security verdict in a GenLayer Intelligent Contract. It is intentionally small, but it is not a hello-world: the useful work happens inside the contract through public web evidence, LLM judgment, equivalence checking, and persistent state.
 
 ## What It Does
