@@ -125,16 +125,83 @@ function getProviderId(
   return rdns ? `rdns:${rdns}` : fallbackId;
 }
 
+function getWalletFingerprint(wallet: WalletProviderOption): string {
+  const name = wallet.name.toLowerCase();
+  const rdns = wallet.rdns?.toLowerCase() || "";
+  const id = wallet.id.toLowerCase();
+
+  if (name.includes("okx") || rdns.includes("okx") || id.includes("okx")) {
+    return "okx";
+  }
+  if (
+    name.includes("metamask") ||
+    rdns.includes("metamask") ||
+    id.includes("metamask")
+  ) {
+    return "metamask";
+  }
+  if (
+    name.includes("phantom") ||
+    rdns.includes("phantom") ||
+    id.includes("phantom")
+  ) {
+    return "phantom";
+  }
+  if (
+    name.includes("coinbase") ||
+    rdns.includes("coinbase") ||
+    id.includes("coinbase")
+  ) {
+    return "coinbase";
+  }
+  if (name.includes("rabby") || rdns.includes("rabby") || id.includes("rabby")) {
+    return "rabby";
+  }
+  if (name.includes("trust") || rdns.includes("trust") || id.includes("trust")) {
+    return "trust";
+  }
+  if (name.includes("brave") || rdns.includes("brave") || id.includes("brave")) {
+    return "brave";
+  }
+
+  return rdns || name || id;
+}
+
+function getWalletCandidateRank(wallet: WalletProviderOption): number {
+  if (wallet.id.startsWith("eip6963:")) return 0;
+  if (wallet.id === "okx") return 1;
+  if (wallet.rdns) return 2;
+  return 3;
+}
+
 function addWalletCandidate(
   wallets: WalletProviderOption[],
   seenProviders: Set<EthereumProvider>,
+  seenWallets: Map<string, WalletProviderOption>,
   candidate: WalletProviderOption | null
 ): void {
   if (!candidate?.provider?.request || seenProviders.has(candidate.provider)) {
     return;
   }
 
+  const fingerprint = getWalletFingerprint(candidate);
+  const existing = seenWallets.get(fingerprint);
+
+  if (existing) {
+    if (getWalletCandidateRank(candidate) < getWalletCandidateRank(existing)) {
+      const index = wallets.findIndex((wallet) => wallet === existing);
+      if (index !== -1) {
+        wallets[index] = candidate;
+      }
+      seenWallets.set(fingerprint, candidate);
+    }
+
+    seenProviders.add(candidate.provider);
+    return;
+  }
+
   seenProviders.add(candidate.provider);
+  seenWallets.set(fingerprint, candidate);
   wallets.push(candidate);
 }
 
@@ -158,10 +225,11 @@ export function getAvailableWalletProviders(): WalletProviderOption[] {
 
   const wallets: WalletProviderOption[] = [];
   const seenProviders = new Set<EthereumProvider>();
+  const seenWallets = new Map<string, WalletProviderOption>();
 
   for (const detail of announcedProviders) {
     const name = getProviderName(detail.provider, detail.info.name);
-    addWalletCandidate(wallets, seenProviders, {
+    addWalletCandidate(wallets, seenProviders, seenWallets, {
       id: `eip6963:${detail.info.uuid}`,
       name,
       rdns: detail.info.rdns,
@@ -172,7 +240,7 @@ export function getAvailableWalletProviders(): WalletProviderOption[] {
   }
 
   if (window.okxwallet?.request) {
-    addWalletCandidate(wallets, seenProviders, {
+    addWalletCandidate(wallets, seenProviders, seenWallets, {
       id: "okx",
       name: "OKX Wallet",
       provider: window.okxwallet,
@@ -182,7 +250,7 @@ export function getAvailableWalletProviders(): WalletProviderOption[] {
 
   window.ethereum?.providers?.forEach((provider, index) => {
     const name = getProviderName(provider);
-    addWalletCandidate(wallets, seenProviders, {
+    addWalletCandidate(wallets, seenProviders, seenWallets, {
       id: getProviderId(provider, `injected:${index}`),
       name,
       provider,
@@ -192,7 +260,7 @@ export function getAvailableWalletProviders(): WalletProviderOption[] {
 
   if (window.ethereum?.request) {
     const name = getProviderName(window.ethereum);
-    addWalletCandidate(wallets, seenProviders, {
+    addWalletCandidate(wallets, seenProviders, seenWallets, {
       id: getProviderId(window.ethereum, "window.ethereum"),
       name,
       provider: window.ethereum,
