@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { User, LogOut, AlertCircle, ExternalLink } from "lucide-react";
+import { User, LogOut, AlertCircle, ExternalLink, Wallet, Check } from "lucide-react";
 import { useWallet } from "@/lib/genlayer/wallet";
-import { success, error, userRejected } from "@/lib/utils/toast";
+import { error, userRejected } from "@/lib/utils/toast";
 import { AddressDisplay } from "./AddressDisplay";
 import { Button } from "./ui/button";
 import {
@@ -25,9 +25,13 @@ export function AccountPanel() {
     isMetaMaskInstalled,
     isOnCorrectNetwork,
     isLoading,
+    availableWallets,
+    selectedWalletId,
+    walletName,
     connectWallet,
     disconnectWallet,
     switchWalletAccount,
+    refreshWallets,
   } = useWallet();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,15 +39,23 @@ export function AccountPanel() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
 
-  const handleConnect = async () => {
+  const handleModalOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (open) {
+      void refreshWallets();
+    }
+  };
+
+  const handleConnect = async (walletId?: string) => {
     if (!isMetaMaskInstalled) {
+      await refreshWallets();
       return;
     }
 
     try {
       setIsConnecting(true);
       setConnectionError("");
-      await connectWallet();
+      await connectWallet(walletId);
       setIsModalOpen(false);
     } catch (err: any) {
       console.error("Failed to connect wallet:", err);
@@ -60,6 +72,28 @@ export function AccountPanel() {
       setIsConnecting(false);
     }
   };
+
+  const walletOptions = (
+    <div className="space-y-2">
+      {availableWallets.map((wallet) => {
+        const selected = wallet.id === selectedWalletId;
+
+        return (
+          <Button
+            key={wallet.id}
+            onClick={() => handleConnect(wallet.id)}
+            variant={selected ? "gradient" : "outline"}
+            className="w-full h-14 justify-start gap-3 text-base"
+            disabled={isConnecting}
+          >
+            <Wallet className="w-5 h-5 shrink-0" />
+            <span className="flex-1 text-left truncate">{wallet.name}</span>
+            {selected && <Check className="w-4 h-4 shrink-0" />}
+          </Button>
+        );
+      })}
+    </div>
+  );
 
   const handleDisconnect = () => {
     disconnectWallet();
@@ -92,7 +126,7 @@ export function AccountPanel() {
   // Not connected state
   if (!isConnected) {
     return (
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
         <DialogTrigger asChild>
           <Button variant="gradient" disabled={isLoading}>
             <User className="w-4 h-4 mr-2" />
@@ -139,15 +173,7 @@ export function AccountPanel() {
               </>
             ) : (
               <>
-                <Button
-                  onClick={handleConnect}
-                  variant="gradient"
-                  className="w-full h-14 text-lg"
-                  disabled={isConnecting}
-                >
-                  <User className="w-5 h-5 mr-2" />
-                  {isConnecting ? "Connecting..." : "Connect Wallet"}
-                </Button>
+                {walletOptions}
 
                 {connectionError && (
                   <Alert variant="destructive">
@@ -159,7 +185,7 @@ export function AccountPanel() {
 
                 <div className="p-4 rounded-lg bg-muted/10 border border-muted/20">
                   <p className="text-xs text-muted-foreground">
-                    This will open OKX Wallet when available and prompt you to:
+                    Choose the exact wallet extension you want to sign with.
                   </p>
                   <ol className="text-xs text-muted-foreground list-decimal list-inside mt-2 space-y-1">
                     <li>Connect your wallet to this application</li>
@@ -177,7 +203,7 @@ export function AccountPanel() {
 
   // Connected state
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
       <div className="flex items-center gap-4">
         <div className="brand-card px-4 py-2 flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -204,6 +230,11 @@ export function AccountPanel() {
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
+          <div className="brand-card p-4 space-y-2">
+            <p className="text-sm text-muted-foreground">Wallet</p>
+            <p className="text-sm">{walletName || "Browser Wallet"}</p>
+          </div>
+
           <div className="brand-card p-4 space-y-2">
             <p className="text-sm text-muted-foreground">Your Address</p>
             <code className="text-sm font-mono break-all">{address}</code>
@@ -247,6 +278,13 @@ export function AccountPanel() {
           )}
 
           <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+            {availableWallets.length > 1 && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Switch wallet</p>
+                {walletOptions}
+              </div>
+            )}
+
             <Button
               onClick={handleSwitchAccount}
               variant="outline"

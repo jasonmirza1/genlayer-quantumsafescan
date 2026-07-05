@@ -21,15 +21,21 @@ export const GENLAYER_NETWORK = {
   blockExplorerUrls: [],
 };
 
+const ACTIVE_WALLET_PROVIDER_KEY = "active_wallet_provider";
+
 // Ethereum provider type from window
-interface EthereumProvider {
+export interface EthereumProvider {
   isMetaMask?: boolean;
   isOkxWallet?: boolean;
   isPhantom?: boolean;
+  isCoinbaseWallet?: boolean;
+  isRabby?: boolean;
+  isTrust?: boolean;
+  isBraveWallet?: boolean;
   providers?: EthereumProvider[];
   request: (args: { method: string; params?: any[] }) => Promise<any>;
-  on: (event: string, handler: (...args: any[]) => void) => void;
-  removeListener: (event: string, handler: (...args: any[]) => void) => void;
+  on?: (event: string, handler: (...args: any[]) => void) => void;
+  removeListener?: (event: string, handler: (...args: any[]) => void) => void;
 }
 
 interface EIP6963ProviderDetail {
@@ -37,8 +43,18 @@ interface EIP6963ProviderDetail {
     uuid: string;
     name: string;
     rdns: string;
+    icon?: string;
   };
   provider: EthereumProvider;
+}
+
+export interface WalletProviderOption {
+  id: string;
+  name: string;
+  rdns?: string;
+  icon?: string;
+  provider: EthereumProvider;
+  isPreferred?: boolean;
 }
 
 declare global {
@@ -50,6 +66,7 @@ declare global {
 
 const announcedProviders: EIP6963ProviderDetail[] = [];
 let providerDiscoveryInitialized = false;
+let activeWalletProviderId: string | null = null;
 
 function discoverInjectedProviders(): void {
   if (typeof window === "undefined") return;
@@ -77,6 +94,164 @@ function discoverInjectedProviders(): void {
   window.dispatchEvent(new Event("eip6963:requestProvider"));
 }
 
+function getStoredWalletProviderId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ACTIVE_WALLET_PROVIDER_KEY);
+}
+
+function getProviderName(provider: EthereumProvider, fallback?: string): string {
+  if (provider.isOkxWallet) return "OKX Wallet";
+  if (provider.isMetaMask) return "MetaMask";
+  if (provider.isPhantom) return "Phantom";
+  if (provider.isCoinbaseWallet) return "Coinbase Wallet";
+  if (provider.isRabby) return "Rabby";
+  if (provider.isTrust) return "Trust Wallet";
+  if (provider.isBraveWallet) return "Brave Wallet";
+  return fallback || "Browser Wallet";
+}
+
+function getProviderId(
+  provider: EthereumProvider,
+  fallbackId: string,
+  rdns?: string
+): string {
+  if (provider.isOkxWallet) return "okx";
+  if (provider.isMetaMask) return "metamask";
+  if (provider.isPhantom) return "phantom";
+  if (provider.isCoinbaseWallet) return "coinbase";
+  if (provider.isRabby) return "rabby";
+  if (provider.isTrust) return "trust";
+  if (provider.isBraveWallet) return "brave";
+  return rdns ? `rdns:${rdns}` : fallbackId;
+}
+
+function addWalletCandidate(
+  wallets: WalletProviderOption[],
+  seenProviders: Set<EthereumProvider>,
+  candidate: WalletProviderOption | null
+): void {
+  if (!candidate?.provider?.request || seenProviders.has(candidate.provider)) {
+    return;
+  }
+
+  seenProviders.add(candidate.provider);
+  wallets.push(candidate);
+}
+
+function sortWallets(wallets: WalletProviderOption[]): WalletProviderOption[] {
+  const priority = (wallet: WalletProviderOption) => {
+    const name = wallet.name.toLowerCase();
+    const rdns = wallet.rdns?.toLowerCase() || "";
+    if (name.includes("okx") || rdns.includes("okx")) return 0;
+    if (name.includes("metamask") || rdns.includes("metamask")) return 1;
+    if (name.includes("phantom") || rdns.includes("phantom")) return 2;
+    return 3;
+  };
+
+  return wallets.sort((a, b) => priority(a) - priority(b));
+}
+
+export function getAvailableWalletProviders(): WalletProviderOption[] {
+  if (typeof window === "undefined") return [];
+
+  discoverInjectedProviders();
+
+  const wallets: WalletProviderOption[] = [];
+  const seenProviders = new Set<EthereumProvider>();
+
+  for (const detail of announcedProviders) {
+    const name = getProviderName(detail.provider, detail.info.name);
+    addWalletCandidate(wallets, seenProviders, {
+      id: `eip6963:${detail.info.uuid}`,
+      name,
+      rdns: detail.info.rdns,
+      icon: detail.info.icon,
+      provider: detail.provider,
+      isPreferred: name.toLowerCase().includes("okx"),
+    });
+  }
+
+  if (window.okxwallet?.request) {
+    addWalletCandidate(wallets, seenProviders, {
+      id: "okx",
+      name: "OKX Wallet",
+      provider: window.okxwallet,
+      isPreferred: true,
+    });
+  }
+
+  window.ethereum?.providers?.forEach((provider, index) => {
+    const name = getProviderName(provider);
+    addWalletCandidate(wallets, seenProviders, {
+      id: getProviderId(provider, `injected:${index}`),
+      name,
+      provider,
+      isPreferred: name.toLowerCase().includes("okx"),
+    });
+  });
+
+  if (window.ethereum?.request) {
+    const name = getProviderName(window.ethereum);
+    addWalletCandidate(wallets, seenProviders, {
+      id: getProviderId(window.ethereum, "window.ethereum"),
+      name,
+      provider: window.ethereum,
+      isPreferred: name.toLowerCase().includes("okx"),
+    });
+  }
+
+  return sortWallets(wallets);
+}
+
+export async function refreshWalletProviders(): Promise<WalletProviderOption[]> {
+  discoverInjectedProviders();
+  await new Promise((resolve) => setTimeout(resolve, 150));
+  return getAvailableWalletProviders();
+}
+
+export function getActiveWalletProviderOption(): WalletProviderOption | null {
+  const wallets = getAvailableWalletProviders();
+  if (wallets.length === 0) {
+    return null;
+  }
+
+  const preferredId = activeWalletProviderId || getStoredWalletProviderId();
+  const selected = preferredId
+    ? wallets.find((wallet) => wallet.id === preferredId)
+    : null;
+
+  return (
+    selected ||
+    wallets.find((wallet) => wallet.isPreferred) ||
+    wallets[0] ||
+    null
+  );
+}
+
+export function setActiveWalletProvider(
+  walletId: string
+): WalletProviderOption | null {
+  const wallet = getAvailableWalletProviders().find(
+    (candidate) => candidate.id === walletId
+  );
+
+  if (!wallet) {
+    return null;
+  }
+
+  activeWalletProviderId = wallet.id;
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem(ACTIVE_WALLET_PROVIDER_KEY, wallet.id);
+  }
+
+  return wallet;
+}
+
+export function getActiveWalletName(): string | null {
+  return getActiveWalletProviderOption()?.name || null;
+}
+
 /**
  * Get the GenLayer RPC URL from environment variables
  */
@@ -99,55 +274,29 @@ export function getContractAddress(): string {
 }
 
 /**
- * Check if MetaMask is installed
+ * Check if an EVM wallet is installed
  */
 export function isMetaMaskInstalled(): boolean {
-  return !!getEthereumProvider();
+  return getAvailableWalletProviders().length > 0;
 }
 
 /**
- * Get the Ethereum provider (MetaMask)
+ * Get the active Ethereum provider
  */
 export function getEthereumProvider(): EthereumProvider | null {
   if (typeof window === "undefined") return null;
-
-  discoverInjectedProviders();
-
-  if (window.okxwallet?.request) {
-    return window.okxwallet;
-  }
-
-  const injectedOkx = window.ethereum?.providers?.find(
-    (provider) => provider.isOkxWallet
-  );
-  if (injectedOkx) {
-    return injectedOkx;
-  }
-
-  const announcedOkx = announcedProviders.find(
-    ({ info, provider }) =>
-      provider.isOkxWallet ||
-      info.name.toLowerCase().includes("okx") ||
-      info.rdns.toLowerCase().includes("okx")
-  );
-
-  return (
-    announcedOkx?.provider ||
-    window.ethereum ||
-    announcedProviders[0]?.provider ||
-    null
-  );
+  return getActiveWalletProviderOption()?.provider || null;
 }
 
 /**
- * Request accounts from MetaMask
+ * Request accounts from the active wallet
  * @returns Array of addresses
  */
 export async function requestAccounts(): Promise<string[]> {
   const provider = getEthereumProvider();
 
   if (!provider) {
-    throw new Error("MetaMask is not installed");
+    throw new Error("No EVM wallet detected");
   }
 
   try {
@@ -159,12 +308,12 @@ export async function requestAccounts(): Promise<string[]> {
     if (error.code === 4001) {
       throw new Error("User rejected the connection request");
     }
-    throw new Error(`Failed to connect to MetaMask: ${error.message}`);
+    throw new Error(`Failed to connect wallet: ${error.message}`);
   }
 }
 
 /**
- * Get current MetaMask accounts without requesting permission
+ * Get current wallet accounts without requesting permission
  * @returns Array of addresses
  */
 export async function getAccounts(): Promise<string[]> {
@@ -186,7 +335,7 @@ export async function getAccounts(): Promise<string[]> {
 }
 
 /**
- * Get the current chain ID from MetaMask
+ * Get the current chain ID from the active wallet
  */
 export async function getCurrentChainId(): Promise<string | null> {
   const provider = getEthereumProvider();
@@ -207,13 +356,13 @@ export async function getCurrentChainId(): Promise<string | null> {
 }
 
 /**
- * Add GenLayer network to MetaMask
+ * Add GenLayer network to the active wallet
  */
 export async function addGenLayerNetwork(): Promise<void> {
   const provider = getEthereumProvider();
 
   if (!provider) {
-    throw new Error("MetaMask is not installed");
+    throw new Error("No EVM wallet detected");
   }
 
   try {
@@ -236,7 +385,7 @@ export async function switchToGenLayerNetwork(): Promise<void> {
   const provider = getEthereumProvider();
 
   if (!provider) {
-    throw new Error("MetaMask is not installed");
+    throw new Error("No EVM wallet detected");
   }
 
   try {
@@ -272,12 +421,12 @@ export async function isOnGenLayerNetwork(): Promise<boolean> {
 }
 
 /**
- * Connect to MetaMask and ensure we're on GenLayer network
+ * Connect to the active wallet and ensure we're on GenLayer network
  * @returns The connected address
  */
 export async function connectMetaMask(): Promise<string> {
   if (!isMetaMaskInstalled()) {
-    throw new Error("MetaMask is not installed");
+    throw new Error("No EVM wallet detected");
   }
 
   // Request accounts
@@ -298,8 +447,8 @@ export async function connectMetaMask(): Promise<string> {
 }
 
 /**
- * Request user to switch MetaMask account
- * Shows MetaMask account picker even if already connected
+ * Request user to switch the active wallet account
+ * Shows the wallet account picker even if already connected
  * Uses wallet_requestPermissions to force account selection dialog
  * @returns The newly selected account address
  */
@@ -307,15 +456,29 @@ export async function switchAccount(): Promise<string> {
   const provider = getEthereumProvider();
 
   if (!provider) {
-    throw new Error("MetaMask is not installed");
+    throw new Error("No EVM wallet detected");
   }
 
   try {
-    // Request permissions - this shows account picker
-    await provider.request({
-      method: "wallet_requestPermissions",
-      params: [{ eth_accounts: {} }],
-    });
+    try {
+      await provider.request({
+        method: "wallet_requestPermissions",
+        params: [{ eth_accounts: {} }],
+      });
+    } catch (error: any) {
+      const unsupported =
+        error.code === -32601 ||
+        error.message?.toLowerCase().includes("unsupported") ||
+        error.message?.toLowerCase().includes("not supported");
+
+      if (!unsupported) {
+        throw error;
+      }
+
+      await provider.request({
+        method: "eth_requestAccounts",
+      });
+    }
 
     // Get the newly selected account
     const accounts = await provider.request({
@@ -338,7 +501,7 @@ export async function switchAccount(): Promise<string> {
 }
 
 /**
- * Create a viem wallet client from MetaMask provider
+ * Create a viem wallet client from the active wallet provider
  */
 export function createMetaMaskWalletClient(): WalletClient | null {
   const provider = getEthereumProvider();
@@ -359,11 +522,11 @@ export function createMetaMaskWalletClient(): WalletClient | null {
 }
 
 /**
- * Create a GenLayer client with MetaMask account
+ * Create a GenLayer client with active wallet account
  *
  * Note: The genlayer-js SDK doesn't directly support custom transports like viem.
  * When an address is provided, the SDK will use the window.ethereum provider
- * automatically for transaction signing via MetaMask.
+ * automatically for transaction signing.
  */
 export function createGenLayerClient(address?: string) {
   const config: any = {

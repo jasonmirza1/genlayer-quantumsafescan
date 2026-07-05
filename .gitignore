@@ -25,5 +25,6 @@ dev-server.err
 /frontend/bun.lock
 /frontend/package-lock.json
 *.compiled.js
+*.tsbuildinfo
 package-lock.json
 

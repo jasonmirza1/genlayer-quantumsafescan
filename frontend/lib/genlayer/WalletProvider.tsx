@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import {
-  isMetaMaskInstalled,
   connectMetaMask,
   switchAccount,
   getAccounts,
@@ -10,6 +9,11 @@ import {
   isOnGenLayerNetwork,
   getEthereumProvider,
   GENLAYER_CHAIN_ID,
+  getActiveWalletName,
+  getActiveWalletProviderOption,
+  refreshWalletProviders,
+  setActiveWalletProvider,
+  type WalletProviderOption,
 } from "./client";
 import { error, userRejected, warning } from "../utils/toast";
 
@@ -23,12 +27,16 @@ export interface WalletState {
   isLoading: boolean;
   isMetaMaskInstalled: boolean;
   isOnCorrectNetwork: boolean;
+  availableWallets: WalletProviderOption[];
+  selectedWalletId: string | null;
+  walletName: string | null;
 }
 
 interface WalletContextValue extends WalletState {
-  connectWallet: () => Promise<string>;
+  connectWallet: (walletId?: string) => Promise<string>;
   disconnectWallet: () => void;
   switchWalletAccount: () => Promise<string>;
+  refreshWallets: () => Promise<WalletProviderOption[]>;
 }
 
 // Create context with undefined default (will error if used outside Provider)
@@ -46,12 +54,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     isLoading: true,
     isMetaMaskInstalled: false,
     isOnCorrectNetwork: false,
+    availableWallets: [],
+    selectedWalletId: null,
+    walletName: null,
   });
 
   // Check MetaMask installation and load account on mount
   useEffect(() => {
     const initWallet = async () => {
-      const installed = isMetaMaskInstalled();
+      const wallets = await refreshWalletProviders();
+      const activeWallet = getActiveWalletProviderOption();
+      const installed = wallets.length > 0;
 
       if (!installed) {
         setState({
@@ -61,6 +74,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           isLoading: false,
           isMetaMaskInstalled: false,
           isOnCorrectNetwork: false,
+          availableWallets: [],
+          selectedWalletId: null,
+          walletName: null,
         });
         return;
       }
@@ -80,6 +96,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             isLoading: false,
             isMetaMaskInstalled: true,
             isOnCorrectNetwork: false,
+            availableWallets: wallets,
+            selectedWalletId: activeWallet?.id || null,
+            walletName: activeWallet?.name || null,
           });
           return;
         }
@@ -100,6 +119,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           isLoading: false,
           isMetaMaskInstalled: true,
           isOnCorrectNetwork: correctNetwork,
+          availableWallets: wallets,
+          selectedWalletId: activeWallet?.id || null,
+          walletName: activeWallet?.name || null,
         });
       } catch (error) {
         console.error("Error initializing wallet:", error);
@@ -110,6 +132,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           isLoading: false,
           isMetaMaskInstalled: true,
           isOnCorrectNetwork: false,
+          availableWallets: wallets,
+          selectedWalletId: activeWallet?.id || null,
+          walletName: activeWallet?.name || null,
         });
       }
     };
@@ -121,9 +146,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const provider = getEthereumProvider();
 
-    if (!provider) {
+    if (!provider?.on || !provider.removeListener) {
       return;
     }
+
+    const addProviderListener = provider.on.bind(provider);
+    const removeProviderListener = provider.removeListener.bind(provider);
 
     const handleAccountsChanged = async (accounts: string[]) => {
       const chainId = await getCurrentChainId();
@@ -141,6 +169,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         chainId,
         isConnected: accounts.length > 0,
         isOnCorrectNetwork: correctNetwork,
+        walletName: getActiveWalletName(),
       }));
     };
 
@@ -156,6 +185,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         address: accounts[0] || null,
         isConnected: accounts.length > 0,
         isOnCorrectNetwork: correctNetwork,
+        walletName: getActiveWalletName(),
       }));
     };
 
@@ -168,24 +198,48 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     };
 
     // Add event listeners
-    provider.on("accountsChanged", handleAccountsChanged);
-    provider.on("chainChanged", handleChainChanged);
-    provider.on("disconnect", handleDisconnect);
+    addProviderListener("accountsChanged", handleAccountsChanged);
+    addProviderListener("chainChanged", handleChainChanged);
+    addProviderListener("disconnect", handleDisconnect);
 
     // Cleanup
     return () => {
-      provider.removeListener("accountsChanged", handleAccountsChanged);
-      provider.removeListener("chainChanged", handleChainChanged);
-      provider.removeListener("disconnect", handleDisconnect);
+      removeProviderListener("accountsChanged", handleAccountsChanged);
+      removeProviderListener("chainChanged", handleChainChanged);
+      removeProviderListener("disconnect", handleDisconnect);
     };
+  }, [state.selectedWalletId]);
+
+  const refreshWallets = useCallback(async () => {
+    const wallets = await refreshWalletProviders();
+    const activeWallet = getActiveWalletProviderOption();
+
+    setState((prev) => ({
+      ...prev,
+      availableWallets: wallets,
+      selectedWalletId: activeWallet?.id || prev.selectedWalletId,
+      walletName: activeWallet?.name || prev.walletName,
+      isMetaMaskInstalled: wallets.length > 0,
+    }));
+
+    return wallets;
   }, []);
 
   /**
    * Connect to MetaMask
    */
-  const connectWallet = useCallback(async () => {
+  const connectWallet = useCallback(async (walletId?: string) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true }));
+
+      const wallets = await refreshWalletProviders();
+      const selectedWallet = walletId
+        ? setActiveWalletProvider(walletId)
+        : getActiveWalletProviderOption();
+
+      if (!selectedWallet) {
+        throw new Error("No EVM wallet detected");
+      }
 
       const address = await connectMetaMask();
       const chainId = await getCurrentChainId();
@@ -204,6 +258,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isLoading: false,
         isMetaMaskInstalled: true,
         isOnCorrectNetwork: correctNetwork,
+        availableWallets: wallets,
+        selectedWalletId: selectedWallet.id,
+        walletName: selectedWallet.name,
       });
 
       return address;
@@ -214,7 +271,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       // Handle specific error types with appropriate toasts
       if (err.message?.includes("rejected")) {
         userRejected("Connection cancelled");
-      } else if (err.message?.includes("MetaMask is not installed")) {
+      } else if (err.message?.includes("No EVM wallet detected")) {
         error("Wallet not found", {
           description: "Please install or enable an EVM wallet extension.",
           action: {
@@ -279,6 +336,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isLoading: false,
         isMetaMaskInstalled: true,
         isOnCorrectNetwork: correctNetwork,
+        availableWallets: state.availableWallets,
+        selectedWalletId: state.selectedWalletId,
+        walletName: getActiveWalletName(),
       });
 
       return newAddress;
@@ -297,13 +357,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       throw err;
     }
-  }, []);
+  }, [state.availableWallets, state.selectedWalletId]);
 
   const value: WalletContextValue = {
     ...state,
     connectWallet,
     disconnectWallet,
     switchWalletAccount,
+    refreshWallets,
   };
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
