@@ -20,6 +20,7 @@ QuantumSafeScan Lite is a GenLayer-powered AI security and quantum-readiness sca
 Evidence:
 
 - GitHub repo URL: https://github.com/jasonmirza1/genlayer-quantumsafescan
+- Intelligent Contract source (GitHub File): https://github.com/jasonmirza1/genlayer-quantumsafescan/blob/e433d4b853f42d5acf8ce77e68b59930bd5846ff/contracts/quantum_safe_scan.py
 - Live app URL: https://genlayer-quantumsafescan-jackmirza.vercel.app
 - Demo video URL: https://youtu.be/2UdHXMNzuDA
 - Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
@@ -38,6 +39,7 @@ Evidence:
 - Network name: Genlayer Bradbury Testnet
 - Chain ID: `4221`
 - RPC: `https://rpc-bradbury.genlayer.com`
+- Intelligent Contract source: https://github.com/jasonmirza1/genlayer-quantumsafescan/blob/e433d4b853f42d5acf8ce77e68b59930bd5846ff/contracts/quantum_safe_scan.py
 - Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
 - Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
 - Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`

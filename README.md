@@ -137,6 +137,7 @@ Primary deployment:
 - Network: Genlayer Bradbury Testnet (`testnet-bradbury`)
 - Chain ID: `4221`
 - RPC: `https://rpc-bradbury.genlayer.com`
+- Intelligent Contract source: https://github.com/jasonmirza1/genlayer-quantumsafescan/blob/e433d4b853f42d5acf8ce77e68b59930bd5846ff/contracts/quantum_safe_scan.py
 - Contract address: `0xfdD81CD278e82151ce213863EEae8059C0136eC6`
 - Deployment transaction hash: `0xb832cacd47755f6c94d307d7b28a623a99022662a586e2b0ea0b459e916d0454`
 - Contract explorer link: https://explorer-bradbury.genlayer.com/address/0xfdD81CD278e82151ce213863EEae8059C0136eC6
