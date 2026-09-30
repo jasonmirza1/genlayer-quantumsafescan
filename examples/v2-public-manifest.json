@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/jasonmirza1/genlayer-quantumsafescan",
+  "commit": "79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad",
+  "files": [
+    {
+      "path": "frontend/lib/contracts/types.ts",
+      "sha256": "a663c9d49c9c83a09688fd484734dfb8e7963d64d8bda4c03f4249aabeb9e9c2"
+    },
+    {
+      "path": "frontend/package.json",
+      "sha256": "93973eadf3ccf17a31e2932fec68107376cf6c1eb4f22c670fa0a5c7c4f00c64"
+    }
+  ]
+}

@@ -16,6 +16,7 @@ import {
   type WalletProviderOption,
 } from "./client";
 import { error, userRejected, warning } from "../utils/toast";
+import { readWalletPreference, writeWalletPreference } from "./wallet-preferences";
 
 // localStorage key for tracking user's disconnect intent
 const DISCONNECT_FLAG = "wallet_disconnected";
@@ -62,33 +63,31 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   // Check MetaMask installation and load account on mount
   useEffect(() => {
     const initWallet = async () => {
-      const wallets = await refreshWalletProviders();
-      const activeWallet = getActiveWalletProviderOption();
-      const installed = wallets.length > 0;
+      let wallets: WalletProviderOption[] = [];
+      let activeWallet: WalletProviderOption | null = null;
+      try {
+        wallets = await refreshWalletProviders();
+        activeWallet = getActiveWalletProviderOption();
+        const installed = wallets.length > 0;
 
-      if (!installed) {
-        setState({
-          address: null,
-          chainId: null,
-          isConnected: false,
-          isLoading: false,
-          isMetaMaskInstalled: false,
-          isOnCorrectNetwork: false,
-          availableWallets: [],
-          selectedWalletId: null,
-          walletName: null,
-        });
-        return;
-      }
+        if (!installed) {
+          setState({
+            address: null,
+            chainId: null,
+            isConnected: false,
+            isLoading: false,
+            isMetaMaskInstalled: false,
+            isOnCorrectNetwork: false,
+            availableWallets: [],
+            selectedWalletId: null,
+            walletName: null,
+          });
+          return;
+        }
 
-      // Check if user intentionally disconnected
-      // If they did, don't auto-reconnect even if MetaMask has permissions
-      if (typeof window !== "undefined") {
-        const wasDisconnected =
-          localStorage.getItem(DISCONNECT_FLAG) === "true";
-
-        if (wasDisconnected) {
-          // User explicitly disconnected, don't auto-reconnect
+        // Do not auto-reconnect after an intentional disconnect, or if its
+        // persisted preference cannot be read. Explicit connection still works.
+        if (readWalletPreference(DISCONNECT_FLAG, "true") === "true") {
           setState({
             address: null,
             chainId: null,
@@ -102,9 +101,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           });
           return;
         }
-      }
 
-      try {
         // Get current accounts (without requesting)
         // This will auto-reconnect if MetaMask has existing permissions
         // and user didn't explicitly disconnect
@@ -117,7 +114,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           chainId,
           isConnected: accounts.length > 0,
           isLoading: false,
-          isMetaMaskInstalled: true,
+          isMetaMaskInstalled: wallets.length > 0,
           isOnCorrectNetwork: correctNetwork,
           availableWallets: wallets,
           selectedWalletId: activeWallet?.id || null,
@@ -130,7 +127,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           chainId: null,
           isConnected: false,
           isLoading: false,
-          isMetaMaskInstalled: true,
+          isMetaMaskInstalled: wallets.length > 0,
           isOnCorrectNetwork: false,
           availableWallets: wallets,
           selectedWalletId: activeWallet?.id || null,
@@ -160,7 +157,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       // If user connected via MetaMask UI, clear the disconnect flag
       // This allows future auto-reconnects
       if (accounts.length > 0 && typeof window !== "undefined") {
-        localStorage.removeItem(DISCONNECT_FLAG);
+        writeWalletPreference(DISCONNECT_FLAG, null);
       }
 
       setState((prev) => ({
@@ -248,7 +245,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       // User is connecting, clear the disconnect flag
       // This allows auto-reconnect on future page loads
       if (typeof window !== "undefined") {
-        localStorage.removeItem(DISCONNECT_FLAG);
+        writeWalletPreference(DISCONNECT_FLAG, null);
       }
 
       setState({
@@ -297,7 +294,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     // Persist user's intent to disconnect
     // This prevents auto-reconnect on page refresh
     if (typeof window !== "undefined") {
-      localStorage.setItem(DISCONNECT_FLAG, "true");
+      writeWalletPreference(DISCONNECT_FLAG, "true");
     }
 
     setState((prev) => ({
@@ -324,7 +321,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       // Clear disconnect flag - user is actively connecting
       if (typeof window !== "undefined") {
-        localStorage.removeItem(DISCONNECT_FLAG);
+        writeWalletPreference(DISCONNECT_FLAG, null);
       }
 
       // Update state immediately for better UX

@@ -1,5 +1,17 @@
 # QuantumSafeScan Lite
 
+## New v2 milestone (not yet deployed)
+
+The accepted v1 deployment remains unchanged. The new
+[`contracts/quantum_safe_scan_v2.py`](contracts/quantum_safe_scan_v2.py) adds
+commit-pinned, exact-byte evidence receipts, grounded findings and independent
+validator checks. Incomplete reviews return INCONCLUSIVE with no score.
+See [v2 protocol and limits](docs/V2_PROTOCOL.md) and
+[manual deployment/milestone checklist](docs/MILESTONE_V1.md).
+The frontend defaults to v1; `NEXT_PUBLIC_SCAN_VERSION=2` enables the separate
+Studio Next console. No new deployment, live-chain success or Portal submission
+is claimed until the checklist is completed.
+
 AI Security & Quantum Readiness Scanner on GenLayer.
 
 Demo video: https://youtu.be/2UdHXMNzuDA

@@ -16,7 +16,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: genvm-lint check contracts/quantum_safe_scan.py
+      - run: genvm-lint check contracts/quantum_safe_scan.py --json
+      - run: genvm-lint check contracts/quantum_safe_scan_v2.py --json
 
   test-direct:
     name: Direct Mode Tests
@@ -27,4 +28,25 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: pytest tests/direct/test_quantum_safe_scan.py -v
+      - run: pytest tests/direct/test_quantum_safe_scan.py tests/direct/test_quantum_safe_scan_v2.py -v
+      # Keep the SDK process separate from the unit tests' SDK substitutes.
+      - run: pytest tests/sdk/test_quantum_safe_scan_v2_sdk.py -v
+
+  frontend:
+    name: Frontend v${{ matrix.version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ["1", "2"]
+    env:
+      NEXT_PUBLIC_SCAN_VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.18.0"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run test:frontend
+      - run: npm run lint
+      - run: npm run build

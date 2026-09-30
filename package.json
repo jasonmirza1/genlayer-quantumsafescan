@@ -2,12 +2,14 @@
   "name": "quantum-safe-scan-lite",
   "type": "module",
   "private": true,
+  "engines": { "node": ">=22.18.0" },
   "workspaces": ["frontend"],
   "scripts": {
     "dev": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
     "start": "cd frontend && npm run start",
     "lint": "cd frontend && npm run lint",
+    "test:frontend": "node --experimental-strip-types --test tests/frontend/*.test.mjs",
     "deploy": "genlayer deploy"
   },
   "devDependencies": {

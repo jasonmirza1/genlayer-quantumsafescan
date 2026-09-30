@@ -2,23 +2,33 @@
 
 import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
+import { studioDevnet } from "genlayer-js-next/chains";
+import { createClient as createNextClient } from "genlayer-js-next";
 import { createWalletClient, custom, type WalletClient } from "viem";
+import { readWalletPreference, writeWalletPreference } from "./wallet-preferences";
 
 // GenLayer Network Configuration (from environment variables with fallbacks)
-export const GENLAYER_CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_GENLAYER_CHAIN_ID || "4221");
+export const SCAN_VERSION = process.env.NEXT_PUBLIC_SCAN_VERSION === "2" ? 2 : 1;
+export const GENLAYER_CHAIN_ID = SCAN_VERSION === 2 ? 61997 : 4221;
 export const GENLAYER_CHAIN_ID_HEX = `0x${GENLAYER_CHAIN_ID.toString(16).toUpperCase()}`;
-export const GENLAYER_CHAIN = testnetBradbury;
+export const GENLAYER_CHAIN = SCAN_VERSION === 2 ? {
+  ...studioDevnet,
+  id: 61997,
+  name: "GenLayer Studio Next",
+  rpcUrls: { default: { http: ["https://studio-dev.genlayer.com/api"] } },
+  blockExplorers: { default: { name: "Studio Next Explorer", url: "https://explorer-studio-dev.genlayer.com" } },
+} : testnetBradbury;
 
 export const GENLAYER_NETWORK = {
   chainId: GENLAYER_CHAIN_ID_HEX,
-  chainName: process.env.NEXT_PUBLIC_GENLAYER_CHAIN_NAME || "GenLayer Bradbury",
+  chainName: SCAN_VERSION === 2 ? "GenLayer Studio Next" : "GenLayer Bradbury",
   nativeCurrency: {
     name: process.env.NEXT_PUBLIC_GENLAYER_SYMBOL || "GEN",
     symbol: process.env.NEXT_PUBLIC_GENLAYER_SYMBOL || "GEN",
     decimals: 18,
   },
-  rpcUrls: [process.env.NEXT_PUBLIC_GENLAYER_RPC_URL || "https://rpc-bradbury.genlayer.com"],
-  blockExplorerUrls: [],
+  rpcUrls: [SCAN_VERSION === 2 ? "https://studio-dev.genlayer.com/api" : (process.env.NEXT_PUBLIC_GENLAYER_RPC_URL || "https://rpc-bradbury.genlayer.com")],
+  blockExplorerUrls: [SCAN_VERSION === 2 ? "https://explorer-studio-dev.genlayer.com" : "https://explorer-bradbury.genlayer.com"],
 };
 
 const ACTIVE_WALLET_PROVIDER_KEY = "active_wallet_provider";
@@ -104,7 +114,7 @@ function discoverInjectedProviders(): void {
 
 function getStoredWalletProviderId(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(ACTIVE_WALLET_PROVIDER_KEY);
+  return readWalletPreference(ACTIVE_WALLET_PROVIDER_KEY);
 }
 
 function getProviderName(provider: EthereumProvider, fallback?: string): string {
@@ -361,7 +371,7 @@ export function setActiveWalletProvider(
   activeWalletProviderId = wallet.id;
 
   if (typeof window !== "undefined") {
-    localStorage.setItem(ACTIVE_WALLET_PROVIDER_KEY, wallet.id);
+    writeWalletPreference(ACTIVE_WALLET_PROVIDER_KEY, wallet.id);
   }
 
   return wallet;
@@ -375,6 +385,7 @@ export function getActiveWalletName(): string | null {
  * Get the GenLayer RPC URL from environment variables
  */
 export function getStudioUrl(): string {
+  if (SCAN_VERSION === 2) return "https://studio-dev.genlayer.com/api";
   return (
     process.env.NEXT_PUBLIC_GENLAYER_RPC_URL || "https://rpc-bradbury.genlayer.com"
   );
@@ -384,7 +395,7 @@ export function getStudioUrl(): string {
  * Get the contract address from environment variables
  */
 export function getContractAddress(): string {
-  const address = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+  const address = SCAN_VERSION === 2 ? process.env.NEXT_PUBLIC_V2_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
   if (!address) {
     // Return empty string during build, error will be shown in UI during runtime
     return "";
@@ -661,13 +672,13 @@ export function createGenLayerClient(address?: string) {
   }
 
   try {
-    return createClient(config);
+    return SCAN_VERSION === 2 ? createNextClient(config) : createClient(config);
   } catch (error) {
     console.error("Error creating GenLayer client:", error);
     // Return client without account on error
-    return createClient({
-      chain: GENLAYER_CHAIN,
-    });
+    return SCAN_VERSION === 2
+      ? createNextClient({ chain: GENLAYER_CHAIN })
+      : createClient({ chain: GENLAYER_CHAIN });
   }
 }
 

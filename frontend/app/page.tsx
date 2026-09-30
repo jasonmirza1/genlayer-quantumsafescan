@@ -3,26 +3,28 @@
 import { AccountPanel } from "@/components/AccountPanel";
 import { LogoMark } from "@/components/Logo";
 import { QuantumSafeScanner } from "@/components/QuantumSafeScanner";
+import { QuantumSafeScannerV2 } from "@/components/QuantumSafeScannerV2";
+import { SCAN_VERSION, GENLAYER_NETWORK } from "@/lib/genlayer/client";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-white/10 bg-black/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <LogoMark size="md" />
-            <div>
-              <p className="text-sm font-semibold">QuantumSafeScan Lite</p>
-              <p className="text-xs text-muted-foreground">GenLayer Builder Project</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold">QuantumSafeScan Lite</p>
+              <p className="truncate text-xs text-muted-foreground">GenLayer Builder Project</p>
             </div>
           </div>
-          <AccountPanel />
+          <div className="shrink-0 pl-2"><AccountPanel /></div>
         </div>
       </header>
 
       <main className="flex-grow px-4 py-8 md:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <QuantumSafeScanner />
+          {SCAN_VERSION === 2 ? <QuantumSafeScannerV2 /> : <QuantumSafeScanner />}
         </div>
       </main>
 
@@ -37,12 +39,12 @@ export default function HomePage() {
             GenLayer
           </a>
           <a
-            href="https://explorer-bradbury.genlayer.com"
+            href={GENLAYER_NETWORK.blockExplorerUrls[0]}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-accent transition-colors"
           >
-            Bradbury Explorer
+            {SCAN_VERSION === 2 ? "Studio Next Explorer" : "Bradbury Explorer"}
           </a>
           <a
             href="https://docs.genlayer.com"
