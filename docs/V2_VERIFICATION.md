@@ -59,10 +59,14 @@ is separate from the recorded live evidence:
   separate project, preserving the accepted v1 site. Production build passed;
   installed dependencies reported zero advisories. Hosted read-only load
   confirmed the configured v2 contract and finalized scan count 1.
-- [Public demo](https://genlayer-quantumsafescan-v2.vercel.app/demo): a 1080p,
-  approximately 1:57 silent walkthrough, with real console captures, recorded
-  explorer evidence, actual receipt download, captions and written notes. The
-  updated video contains no audio stream. Browser
+- [Public demo](https://genlayer-quantumsafescan-v2.vercel.app/demo): a roughly
+  45-second silent browser recording at the actual 1128×556 viewport. It shows
+  the connected wallet, read-only state load and scrolling through receipt #1.
+  Actual browser captures retain their elapsed timing; no slide scenes, title
+  cards, simulated wallet state or audio are added. This is an automated browser
+  capture, not a claim of human-recorded provenance. The
+  [separate evidence page](https://genlayer-quantumsafescan-v2.vercel.app/evidence)
+  links the original receipt, accepted transaction and source independently. Browser
   video metadata loaded successfully with no media error. It is not a new live
   signing session or independent audit.
 - Additional frontend checks after adding the demo: TypeScript passed;

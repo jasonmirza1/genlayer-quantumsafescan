@@ -88,8 +88,9 @@ recovery record or send the same request again.
 
 - Public milestone source comparison: [pre-milestone baseline → main](https://github.com/jasonmirza1/genlayer-quantumsafescan/compare/79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad...main)
 - [Live v2 scanner](https://genlayer-quantumsafescan-v2.vercel.app)
-- [Silent demo and actual finalized receipt](https://genlayer-quantumsafescan-v2.vercel.app/demo)
-- [Direct demo MP4](https://genlayer-quantumsafescan-v2.vercel.app/demo/quantumsafescan-v2-demo.mp4)
+- [Silent browser recording](https://genlayer-quantumsafescan-v2.vercel.app/demo)
+- [Separate submission evidence](https://genlayer-quantumsafescan-v2.vercel.app/evidence)
+- [Direct recording MP4](https://genlayer-quantumsafescan-v2.vercel.app/demo/quantumsafescan-v2-screen-recording.mp4)
 - [Actual exported receipt JSON](https://genlayer-quantumsafescan-v2.vercel.app/demo/quantumsafescan-v2-receipt-1.json)
 - [New Studio Next v2 contract](https://explorer-studio-next.genlayer.com/address/0x5855993b828491297a5fED25cA7aa15EDb165845): `0x5855993b828491297a5fED25cA7aa15EDb165845`
 - Deployment: the user's explorer capture shows FINALIZED, GenVM SUCCESS,
@@ -99,15 +100,16 @@ recovery record or send the same request again.
 - Finalized read: scan count **1**; receipt **#1, REVIEWED, 70/100, MEDIUM**;
   two files VERIFIED with matching expected and observed SHA-256 digests.
 - Manifest SHA-256: `be753f001a982f8d4bdc5a98dc667213232730970ef1bf4f38c6288cb500bfae`.
-- Demo: 1080p silent walkthrough of the already finalized scan, with real
-  connected-wallet console captures, explorer evidence, English captions and a
-  written notes. No audio track. This does not claim a second scan or a newly recorded signing.
+- Demo: roughly 45 seconds of the real wallet-connected console at its native
+  1128×556 viewport, with read-only loading and scrolling. No sound, slides,
+  title cards or staged signing. It is an automated browser capture, not a claim
+  of human-recorded provenance. Evidence links are kept separate from the video.
 - Portal submission: **NOT SUBMITTED**
 
 ## Portal handoff
 
 Choose Builder → Milestones and the accepted QuantumSafeScan Lite project.
 Paste the title and description above. Add the public source comparison, live
-v2 scanner, demo page and accepted scan transaction as supporting links. The
-demo page also exposes the original receipt JSON for independent review. Review
+v2 scanner, demo page, original receipt JSON and accepted scan transaction as
+individual evidence items. The separate evidence page lists these links. Review
 the form and perform the final Submit Contribution manually.
