@@ -1,22 +1,32 @@
 # QuantumSafeScan Lite
 
-## New v2 milestone (not yet deployed)
+## Live v2 milestone — Studio Next
 
 The accepted v1 deployment remains unchanged. The new
 [`contracts/quantum_safe_scan_v2.py`](contracts/quantum_safe_scan_v2.py) adds
 commit-pinned, exact-byte evidence receipts, grounded findings and independent
 validator checks. Incomplete reviews return INCONCLUSIVE with no score.
 See [v2 protocol and limits](docs/V2_PROTOCOL.md) and
-[manual deployment/milestone checklist](docs/MILESTONE_V1.md).
-The frontend defaults to v1; `NEXT_PUBLIC_SCAN_VERSION=2` enables the separate
-Studio Next console. No new deployment, live-chain success or Portal submission
-is claimed until the checklist is completed.
+[milestone notes and verified evidence](docs/MILESTONE_V1.md).
+
+- [Live v2 scanner](https://genlayer-quantumsafescan-v2.vercel.app)
+- [Narrated v2 demo and actual receipt](https://genlayer-quantumsafescan-v2.vercel.app/demo)
+- [Studio Next v2 contract](https://explorer-studio-next.genlayer.com/address/0x5855993b828491297a5fED25cA7aa15EDb165845)
+- [Accepted finalized scan](https://explorer-studio-next.genlayer.com/tx/0x322e0b28721d5267e39b0b21617580fb2a441ef0d964c0aa33c15cb49ca43380)
+
+Receipt #1 is REVIEWED: 70/100, MEDIUM observed-file risk, with two exact-byte
+verified files. This assesses selected files, not the entire repository or
+quantum safety. The separate v2 Vercel project uses `NEXT_PUBLIC_SCAN_VERSION=2`;
+the source defaults to v1 so the accepted v1 deployment is preserved. Portal
+milestone submission remains manual; it is not claimed as submitted here.
+
+## Original v1 project
 
 AI Security & Quantum Readiness Scanner on GenLayer.
 
-Demo video: https://youtu.be/2UdHXMNzuDA
+Original v1 demo video: https://youtu.be/2UdHXMNzuDA
 
-Live app: https://genlayer-quantumsafescan-jackmirza.vercel.app
+Original v1 live app: https://genlayer-quantumsafescan-jackmirza.vercel.app
 
 QuantumSafeScan Lite is a GenLayer Builder project that scans public GitHub repository evidence and stores a validator-verifiable security verdict in a GenLayer Intelligent Contract. It is intentionally small, but it is not a hello-world: the useful work happens inside the contract through public web evidence, LLM judgment, equivalence checking, and persistent state.
 
@@ -228,7 +238,10 @@ Suggested screenshots:
 
 ## Demo Video
 
-TODO: Add demo video link after deployment.
+The [v2 narrated walkthrough](https://genlayer-quantumsafescan-v2.vercel.app/demo)
+shows actual connected-console captures and the public accepted transaction.
+It is a walkthrough of an already finalized, manually approved scan, not footage
+of another signing session. The original v1 video remains linked above.
 
 ## Submission
 

@@ -1,0 +1,2 @@
+# Preserve the downloaded evidence export byte-for-byte on every platform.
+frontend/public/demo/quantumsafescan-v2-receipt-1.json -text

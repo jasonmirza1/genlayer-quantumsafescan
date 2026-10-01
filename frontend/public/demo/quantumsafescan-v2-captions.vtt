@@ -1,0 +1,37 @@
+WEBVTT
+
+01
+00:00:00.000 --> 00:00:15.640
+QuantumSafeScan Lite v2
+A real Studio Next scan, from pinned inputs to finalized evidence.
+
+02
+00:00:15.640 --> 00:00:31.680
+Connected wallet and deployed v2 contract
+OKX wallet connected · Studio Next · 1 finalized scan
+
+03
+00:00:31.680 --> 00:00:45.720
+A commit-pinned evidence request
+Full commit SHA + exact file digests make the inputs reproducible.
+
+04
+00:00:45.720 --> 00:01:03.600
+Receipt #1: REVIEWED
+70/100 · MEDIUM observed-file risk · selected files only
+
+05
+00:01:03.600 --> 00:01:22.717
+Verified file bytes and exportable evidence
+Both expected and observed SHA-256 hashes match the complete files.
+
+06
+00:01:22.717 --> 00:01:38.837
+Accepted consensus on Studio Next
+FINALIZED + Accepted · transaction 0x322e0b28…49ca43380
+
+07
+00:01:38.837 --> 00:01:56.877
+Ready for independent review
+Open the hosted scanner · Watch the demo · Download the actual receipt
+

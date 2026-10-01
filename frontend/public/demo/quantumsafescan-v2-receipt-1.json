@@ -1,0 +1,58 @@
+{
+  "network": "Studio Next",
+  "chain_id": 61997,
+  "contract": "0x5855993b828491297a5fED25cA7aa15EDb165845",
+  "receipt": {
+    "commit": "79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad",
+    "evidence_verified": true,
+    "files": [
+      {
+        "byte_length": 955,
+        "expected_sha256": "a663c9d49c9c83a09688fd484734dfb8e7963d64d8bda4c03f4249aabeb9e9c2",
+        "observed_sha256": "a663c9d49c9c83a09688fd484734dfb8e7963d64d8bda4c03f4249aabeb9e9c2",
+        "path": "frontend/lib/contracts/types.ts",
+        "status": "VERIFIED",
+        "url": "https://raw.githubusercontent.com/jasonmirza1/genlayer-quantumsafescan/79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad/frontend/lib/contracts/types.ts"
+      },
+      {
+        "byte_length": 1206,
+        "expected_sha256": "93973eadf3ccf17a31e2932fec68107376cf6c1eb4f22c670fa0a5c7c4f00c64",
+        "observed_sha256": "93973eadf3ccf17a31e2932fec68107376cf6c1eb4f22c670fa0a5c7c4f00c64",
+        "path": "frontend/package.json",
+        "status": "VERIFIED",
+        "url": "https://raw.githubusercontent.com/jasonmirza1/genlayer-quantumsafescan/79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad/frontend/package.json"
+      }
+    ],
+    "findings": [],
+    "id": "1",
+    "manifest": {
+      "commit": "79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad",
+      "files": [
+        {
+          "path": "frontend/lib/contracts/types.ts",
+          "sha256": "a663c9d49c9c83a09688fd484734dfb8e7963d64d8bda4c03f4249aabeb9e9c2"
+        },
+        {
+          "path": "frontend/package.json",
+          "sha256": "93973eadf3ccf17a31e2932fec68107376cf6c1eb4f22c670fa0a5c7c4f00c64"
+        }
+      ],
+      "repository": "https://github.com/jasonmirza1/genlayer-quantumsafescan"
+    },
+    "manifest_sha256": "be753f001a982f8d4bdc5a98dc667213232730970ef1bf4f38c6288cb500bfae",
+    "nonce": "d7b14f47b133d543671dd0588ad557b8",
+    "reason": "NONE",
+    "recommended_fixes": [
+      "Publish clear vulnerability reporting and responsible disclosure guidance.",
+      "Validate cryptographic dependencies and a concrete post-quantum migration path; a plan is not an implementation."
+    ],
+    "risk_level": "MEDIUM",
+    "scope": "SELECTED_FILES_ONLY",
+    "score": 70,
+    "status": "REVIEWED",
+    "submitted_by": "0xa52b0B05E18A35D3d1b4b6EBf9E12024E675e3Ac",
+    "target_url": "https://github.com/jasonmirza1/genlayer-quantumsafescan",
+    "verdict": "MEDIUM observed-file risk by the v2 heuristic. This is not a repository-wide audit or quantum-safety certification.",
+    "version": 2
+  }
+}

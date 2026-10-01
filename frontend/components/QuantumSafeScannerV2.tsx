@@ -120,6 +120,7 @@ export function QuantumSafeScannerV2() {
       <h1 className="text-2xl sm:text-3xl font-bold break-words">QuantumSafeScan Lite v2</h1>
       <p className="text-muted-foreground">Review exact public files at a GitHub commit. Missing evidence means INCONCLUSIVE, not a reassuring risk score.</p>
       <p className="text-sm text-muted-foreground">This is a selected-file heuristic review—not a whole-repository audit or proof of quantum safety. You approve every transaction in your wallet.</p>
+      <a href="/demo" className="inline-block text-sm text-accent underline">Watch the finalized demo and download its actual receipt ↗</a>
       <div className="flex flex-wrap gap-3 text-sm">
         <span className="break-all">{isConnected ? `Wallet connected: ${address}` : "Wallet not connected"}</span>
         <span>{isOnCorrectNetwork ? "Studio Next connected" : "Connect / switch your wallet to Studio Next"}</span>

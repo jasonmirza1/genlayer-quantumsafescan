@@ -1,0 +1,20 @@
+QuantumSafeScan Lite v2
+Quantum Safe Scan Lite version two reviews selected public files on GenLayer. This demo follows a real Studio Next scan, from its pinned evidence to the accepted transaction and finalized receipt.
+
+Connected wallet and deployed v2 contract
+The actual operator wallet is connected to Studio Next. The console is loaded with the deployed version two contract, and the finalized scan count is one. The operator approved the scan manually in OKX.
+
+A commit-pinned evidence request
+The request pins a full GitHub commit and exact byte hashes for two files. Validators independently retrieve the same files, check their digests, and review only that selected evidence.
+
+Receipt #1: REVIEWED
+Finalized receipt one is reviewed. Its recorded heuristic assessment is seventy out of one hundred, with medium observed file risk. This is a selected file review, not a repository wide audit or quantum safety certification.
+
+Verified file bytes and exportable evidence
+Both file receipts are verified. Expected and observed SHA two hundred and fifty six digests match, with nine hundred fifty five bytes and twelve hundred six bytes recorded. The JSON export preserves the manifest, nonce, findings and assessment.
+
+Accepted consensus on Studio Next
+The public GenLayer explorer shows the submitted contract call as finalized, with an accepted consensus result. Its destination matches the deployed contract, and the same request nonce is associated with receipt one.
+
+Ready for independent review
+The hosted version two scanner and public demo page make the result easy to inspect. Reviewers can watch this walkthrough, download the actual receipt, and follow the source delta and explorer links. New scans require manual wallet approval.
