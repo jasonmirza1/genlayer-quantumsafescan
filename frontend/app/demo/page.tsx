@@ -3,7 +3,7 @@ import evidence from "../../public/demo/quantumsafescan-v2-receipt-1.json";
 
 export const metadata: Metadata = {
   title: "QuantumSafeScan Lite v2 — Finalized Demo",
-  description: "A narrated walkthrough of an accepted Studio Next scan, with its original finalized receipt and public transaction evidence.",
+  description: "A silent walkthrough of an accepted Studio Next scan, with its original finalized receipt and public transaction evidence.",
 };
 
 const transaction = "0x322e0b28721d5267e39b0b21617580fb2a441ef0d964c0aa33c15cb49ca43380";
@@ -17,18 +17,18 @@ export default function FinalizedDemo() {
     <header className="space-y-4">
       <p className="text-sm text-accent">QuantumSafeScan Lite v2 · Studio Next · Recorded October 2, 2026</p>
       <h1 className="text-3xl font-bold md:text-5xl">A finalized scan, with verifiable evidence</h1>
-      <p className="max-w-3xl text-muted-foreground">This walkthrough shows the connected wallet, pinned file inputs and the actual result of a scan approved manually in OKX. The public explorer records an Accepted consensus result.</p>
+      <p className="max-w-3xl text-muted-foreground">This silent walkthrough shows the connected wallet, pinned file inputs and the actual result of a scan approved manually in OKX. The public explorer records an Accepted consensus result. No voice, music or audio track.</p>
     </header>
-    <section className="brand-card overflow-hidden p-3 md:p-5" aria-label="Narrated demo video">
+    <section className="brand-card overflow-hidden p-3 md:p-5" aria-label="Silent demo video">
       <video className="aspect-video w-full rounded-lg bg-black" controls playsInline preload="metadata" poster="/demo/quantumsafescan-v2-poster.png">
-        <source src="/demo/quantumsafescan-v2-demo.mp4" type="video/mp4" />
+        <source src="/demo/quantumsafescan-v2-demo.mp4?silent=1" type="video/mp4" />
         <track kind="captions" src="/demo/quantumsafescan-v2-captions.vtt" srcLang="en" label="English" />
         Your browser can <a href="/demo/quantumsafescan-v2-demo.mp4">download the demo MP4</a>.
       </video>
       <div className="mt-4 flex flex-wrap gap-5 text-sm">
-        <a className="text-accent underline" href="/demo/quantumsafescan-v2-demo.mp4" download>Download video</a>
+        <a className="text-accent underline" href="/demo/quantumsafescan-v2-demo.mp4?silent=1" download>Download silent video</a>
         <a className="text-accent underline" href="/demo/quantumsafescan-v2-receipt-1.json" download>Download actual receipt JSON</a>
-        <a className="text-accent underline" href="/demo/quantumsafescan-v2-transcript.txt">Read the transcript</a>
+        <a className="text-accent underline" href="/demo/quantumsafescan-v2-transcript.txt">Read the walkthrough notes</a>
       </div>
     </section>
     <section className="brand-card space-y-5 p-6" aria-label="Recorded receipt evidence">

@@ -10,7 +10,7 @@ See [v2 protocol and limits](docs/V2_PROTOCOL.md) and
 [milestone notes and verified evidence](docs/MILESTONE_V1.md).
 
 - [Live v2 scanner](https://genlayer-quantumsafescan-v2.vercel.app)
-- [Narrated v2 demo and actual receipt](https://genlayer-quantumsafescan-v2.vercel.app/demo)
+- [Silent v2 demo and actual receipt](https://genlayer-quantumsafescan-v2.vercel.app/demo)
 - [Studio Next v2 contract](https://explorer-studio-next.genlayer.com/address/0x5855993b828491297a5fED25cA7aa15EDb165845)
 - [Accepted finalized scan](https://explorer-studio-next.genlayer.com/tx/0x322e0b28721d5267e39b0b21617580fb2a441ef0d964c0aa33c15cb49ca43380)
 
@@ -238,7 +238,7 @@ Suggested screenshots:
 
 ## Demo Video
 
-The [v2 narrated walkthrough](https://genlayer-quantumsafescan-v2.vercel.app/demo)
+The [v2 silent walkthrough](https://genlayer-quantumsafescan-v2.vercel.app/demo)
 shows actual connected-console captures and the public accepted transaction.
 It is a walkthrough of an already finalized, manually approved scan, not footage
 of another signing session. The original v1 video remains linked above.

@@ -60,8 +60,9 @@ is separate from the recorded live evidence:
   installed dependencies reported zero advisories. Hosted read-only load
   confirmed the configured v2 contract and finalized scan count 1.
 - [Public demo](https://genlayer-quantumsafescan-v2.vercel.app/demo): a 1080p,
-  approximately 1:57 narrated walkthrough, with real console captures, recorded
-  explorer evidence, actual receipt download, captions and transcript. Browser
+  approximately 1:57 silent walkthrough, with real console captures, recorded
+  explorer evidence, actual receipt download, captions and written notes. The
+  updated video contains no audio stream. Browser
   video metadata loaded successfully with no media error. It is not a new live
   signing session or independent audit.
 - Additional frontend checks after adding the demo: TypeScript passed;

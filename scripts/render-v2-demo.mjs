@@ -15,6 +15,8 @@ const scenes = [
   { id: "06", title: "Accepted consensus on Studio Next", shot: "04-transaction.png", label: "Public explorer capture at finalization", caption: "FINALIZED + Accepted · transaction 0x322e0b28…49ca43380", narration: "The public GenLayer explorer shows the submitted contract call as finalized, with an accepted consensus result. Its destination matches the deployed contract, and the same request nonce is associated with receipt one." },
   { id: "07", title: "Ready for independent review", caption: "Open the hosted scanner · Watch the demo · Download the actual receipt", narration: "The hosted version two scanner and public demo page make the result easy to inspect. Reviewers can watch this walkthrough, download the actual receipt, and follow the source delta and explorer links. New scans require manual wallet approval." },
 ];
+// Keep the walkthrough silent, with fixed reading time for each visual scene.
+scenes.forEach((scene, index) => { scene.seconds = [16, 16, 14, 18, 19, 16, 18][index]; });
 
 await fs.mkdir(work, { recursive: true });
 await fs.mkdir(published, { recursive: true });
@@ -51,13 +53,13 @@ if (process.argv[2] === "package") {
   let vtt = "WEBVTT\n\n";
   for (const scene of scenes) {
     // Encoders can add padded frames: synchronize captions to encoded clips,
-    // not an estimate from narration length.
+    // not an estimate from planned scene length.
     const duration = movieDuration(await fs.readFile(path.join(work, `${scene.id}.mp4`)));
-    // Use short captions for readability; the full spoken narration is in the transcript.
+    // Use short captions for readability; expanded written notes are separate.
     vtt += `${scene.id}\n${timestamp(time)} --> ${timestamp(time + duration)}\n${scene.title}\n${scene.caption}\n\n`;
     time += duration;
   }
-  await fs.writeFile(path.join(published, "quantumsafescan-v2-captions.vtt"), vtt);
+  await fs.writeFile(path.join(published, "quantumsafescan-v2-captions.vtt"), vtt.trimEnd() + "\n");
   await fs.writeFile(path.join(published, "quantumsafescan-v2-transcript.txt"), scenes.map(s => `${s.title}\n${s.narration}`).join("\n\n") + "\n");
   await fs.writeFile(path.join(work, "concat.txt"), scenes.map(s => `file '${s.id}.mp4'`).join("\n") + "\n");
   console.log(JSON.stringify({ scenes: scenes.length, seconds: time, captions: true }));
@@ -121,5 +123,5 @@ if (process.argv[2] === "package") {
     if (scene.id === "01") await fs.writeFile(path.join(published, "quantumsafescan-v2-poster.png"), frame);
   }
   await fs.writeFile(path.join(work, "scenes.json"), JSON.stringify(scenes, null, 2));
-  console.log(`Prepared ${scenes.length} narrated scenes from actual receipt evidence`);
+  console.log(`Prepared ${scenes.length} silent scenes from actual receipt evidence`);
 }

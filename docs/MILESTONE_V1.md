@@ -7,7 +7,7 @@ old date copied from a previous Portal screenshot.
 
 The user authorized review, fixes and GitHub publication on 2026-10-01.
 The user manually approved the fresh Studio Next deployment and scan. The
-separate v2 scanner and narrated demo are published on Vercel. The final Portal
+separate v2 scanner and silent demo are published on Vercel. The final Portal
 submission remains the user's action. Completed local checks and recorded live
 verification are in [V2_VERIFICATION.md](V2_VERIFICATION.md).
 
@@ -24,9 +24,9 @@ protocol documentation against the unchanged v1 implementation. Use the
 and the final public commit after publication. The v2 contract and accepted
 finalized receipt below are separate from v1's Bradbury evidence.
 
-## Changes & Improvements — ready to paste (938 characters)
+## Changes & Improvements — ready to paste (936 characters)
 
-Built QuantumSafeScan Lite v2 while preserving v1. It reviews 1–5 exact GitHub files at a full commit SHA, verifies complete-byte SHA-256 hashes and records file receipts with grounded line-citation hashes. Validators independently retrieve and review evidence; hashes and normalized decisions must agree. Missing, mismatched, oversized, thin or uncertain evidence and malformed AI output return INCONCLUSIVE without a score. Added caller-scoped replay protection, nonce lookup, regression/real-SDK tests and a Studio Next console with fee review, guarded manual wallet approval, transaction recovery and actual-receipt export. Deployed v2 on Studio Next; an Accepted finalized scan produced receipt #1, REVIEWED, 70/100 MEDIUM, with two verified files. Published the v2 app and a narrated demo with downloadable receipt and explorer proof. Assessments cover selected files only—not repository-wide audits or quantum-safety certification.
+Built QuantumSafeScan Lite v2 while preserving v1. It reviews 1–5 exact GitHub files at a full commit SHA, verifies complete-byte SHA-256 hashes and records file receipts with grounded line-citation hashes. Validators independently retrieve and review evidence; hashes and normalized decisions must agree. Missing, mismatched, oversized, thin or uncertain evidence and malformed AI output return INCONCLUSIVE without a score. Added caller-scoped replay protection, nonce lookup, regression/real-SDK tests and a Studio Next console with fee review, guarded manual wallet approval, transaction recovery and actual-receipt export. Deployed v2 on Studio Next; an Accepted finalized scan produced receipt #1, REVIEWED, 70/100 MEDIUM, with two verified files. Published the v2 app and a silent demo with downloadable receipt and explorer proof. Assessments cover selected files only—not repository-wide audits or quantum-safety certification.
 
 ## Reproduction workflow (deployment, scan and demo already completed)
 
@@ -88,7 +88,7 @@ recovery record or send the same request again.
 
 - Public milestone source comparison: [pre-milestone baseline → main](https://github.com/jasonmirza1/genlayer-quantumsafescan/compare/79fdd96dc399dd8fd03d556a97f3ca7ba7e243ad...main)
 - [Live v2 scanner](https://genlayer-quantumsafescan-v2.vercel.app)
-- [Narrated demo and actual finalized receipt](https://genlayer-quantumsafescan-v2.vercel.app/demo)
+- [Silent demo and actual finalized receipt](https://genlayer-quantumsafescan-v2.vercel.app/demo)
 - [Direct demo MP4](https://genlayer-quantumsafescan-v2.vercel.app/demo/quantumsafescan-v2-demo.mp4)
 - [Actual exported receipt JSON](https://genlayer-quantumsafescan-v2.vercel.app/demo/quantumsafescan-v2-receipt-1.json)
 - [New Studio Next v2 contract](https://explorer-studio-next.genlayer.com/address/0x5855993b828491297a5fED25cA7aa15EDb165845): `0x5855993b828491297a5fED25cA7aa15EDb165845`
@@ -99,9 +99,9 @@ recovery record or send the same request again.
 - Finalized read: scan count **1**; receipt **#1, REVIEWED, 70/100, MEDIUM**;
   two files VERIFIED with matching expected and observed SHA-256 digests.
 - Manifest SHA-256: `be753f001a982f8d4bdc5a98dc667213232730970ef1bf4f38c6288cb500bfae`.
-- Demo: 1080p narrated walkthrough of the already finalized scan, with real
+- Demo: 1080p silent walkthrough of the already finalized scan, with real
   connected-wallet console captures, explorer evidence, English captions and a
-  transcript. This does not claim a second scan or a newly recorded signing.
+  written notes. No audio track. This does not claim a second scan or a newly recorded signing.
 - Portal submission: **NOT SUBMITTED**
 
 ## Portal handoff
